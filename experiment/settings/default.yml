@@ -15,7 +15,7 @@ monitor:
   gamma: 1
 
 design:
-  n_trials: 3
+  n_trials: 60
   likely_distractor_probability: 0.67
 
 mri:

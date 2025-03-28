@@ -6,6 +6,8 @@ import yaml
 from pathlib import Path
 from trial import InstructionTrial, SingletonTrial
 from psychopy import visual, core
+from IPython import embed
+
 
 class SingletonSession(PylinkEyetrackerSession):
 
@@ -57,7 +59,7 @@ class SingletonSession(PylinkEyetrackerSession):
         self.close()
 
 
-    def create_trials(self, most_likely_distractor_location, include_instructions=False):
+    def create_trials(self, most_likely_distractor_location, include_instructions=True):
         """Create trials."""
 
 
@@ -72,12 +74,20 @@ class SingletonSession(PylinkEyetrackerSession):
         possible_itis = self.settings['durations']['iti']
         n_trials = self.settings['design']['n_trials']
 
+        indices = [1, 3, 5, 7, 10]
+        indices.remove(most_likely_distractor_location)
+        indices.insert(0,most_likely_distractor_location)
+
+        t_d_locs = [(t,d) for t in [0,0,0,0,1,2,3] for d in [0,0,0,0,0,0,0,0,0,0,1,2,3] if t != d] + [(t,d) for t in [0,1,2,3] for d in [4]] * 3
+        np.random.shuffle(t_d_locs)
+
         # Assert n_trials is multiple of possible_itis
         assert n_trials % len(possible_itis) == 0, 'n_trials should be multiple of possible itis'
+        assert n_trials % len(t_d_locs) == 0, 'n_trials should be multiple of possible tar/dist combinations'
+
         itis = np.tile(possible_itis, n_trials // len(possible_itis))
         np.random.shuffle(itis)
 
-
-
+        # embed()
         for ix, iti in enumerate(itis):
-            self.trials.append(SingletonTrial(self, ix+1, iti=iti, most_likely_distractor_location=most_likely_distractor_location))
+            self.trials.append(SingletonTrial(self, ix+1, iti=iti, distractor_location=indices[t_d_locs[ix][1]], target_location=indices[t_d_locs[ix][0]],most_likely_distractor_location=most_likely_distractor_location))

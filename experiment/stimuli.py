@@ -13,11 +13,11 @@ class TargetStimulus(object):
 
         # Create visual elements
         self.rectangle = visual.Rect(
-            win=win, pos=self._pos, width=self._size, height=self._size / 3.0,
+            win=win, pos=self._pos, width=self._size, height=self._size / 4.0,
             fillColor=self._color, lineColor=None, ori=self._ori
         )
         self.dot = visual.Circle(
-            win=win, pos=self._pos, radius=self._size / 8, fillColor='black', lineColor=None
+            win=win, pos=self._pos, radius=self._size / 15, fillColor='black', lineColor=None
         )
 
     def update(self, target=None, color=None, ori=None, pos=None, size=None):
@@ -88,8 +88,8 @@ class TargetStimulus(object):
     def size(self, value):
         self._size = value
         self.rectangle.width = value
-        self.rectangle.height = value / 3.0
-        self.dot.radius = value / 8  # Scale dot size with the rectangle
+        self.rectangle.height = value / 4
+        self.dot.radius = value / 15  # Scale dot size with the rectangle
 
 class TargetStimulusArray(object):
 
@@ -118,11 +118,13 @@ class TargetStimulusArray(object):
         - distractor_location: The index (0-7) of the distractor.
         - target_location: The index (0-7) of the target.
         """
+
         assert distractor_color in ['red', 'green']
-        assert 0 <= distractor_location < self.n_objects
+        # assert 0 <= distractor_location < self.n_objects
         assert 0 <= target_location < self.n_objects
 
-        other_color = 'red' if distractor_color == 'green' else 'green'
+        other_color = (0.78,0.14,-1) if distractor_color == 'green' else (-1, 0.33, -1)
+        distractor_color = (0.78,0.14,-1)  if distractor_color == 'red' else (-1, 0.33, -1)
         other_orientation = 90. if target_orientation == 0.0 else 0.0
 
         print(f'Setting up trial: distractor={distractor_location},\ntarget={target_location},\ndistractor_color={distractor_color},\ntarget_orientation={target_orientation}\n other_color={other_color},\nother_orientation={other_orientation}')
@@ -217,7 +219,7 @@ plugins.loadPlugin('psychopy_visionscience')
 from psychopy import visual, core, event
 
 class SweepingBarStimulus:
-    def __init__(self, win, session, fov_size=20, bar_width=2, speed=2, rest_duration=2):
+    def __init__(self, win, session, fov_size=20, bar_width=2, speed=2, rest_duration=2, break_duration=18):
         """
         Creates a sweeping checkerboard bar stimulus that properly rotates for vertical motion.
 
@@ -226,6 +228,8 @@ class SweepingBarStimulus:
         :param bar_width: Width of the sweeping bar (deg)
         :param speed: Speed of bar movement (deg/sec)
         :param rest_duration: Duration (sec) of rest between sweeps
+        :param break_duration: Duration (sec) of break after four sweeps. note that we start with a rest, so it will be break + rest
+
         """
         self.win = win
         self.session = session
@@ -234,12 +238,13 @@ class SweepingBarStimulus:
         self.bar_width = bar_width
         self.speed = speed
         self.rest_duration = rest_duration
+        self.break_duration = break_duration
         self.clock = core.Clock()
         self.flicker_clock = core.Clock()
         self.contrast = 1.0
 
         # ✅ Define paradigm: movement directions + rest periods
-        self.directions = ["rest", "right", "rest", "left", "rest", "down", "rest", "up", "rest"]
+        self.directions = ["rest", "right", "rest", "left", "rest", "down", "rest", "up", "break"]
         self.current_direction_index = 0  # Start with the first direction
         self.sweep_clock = core.Clock()  # Keeps track of how long we've been in the current sweep
 
@@ -282,6 +287,8 @@ class SweepingBarStimulus:
 
         if direction == "rest":
             self.bar.opacity = 0  # Hide the bar during rest
+        elif direction == "break":
+            self.bar.opacity = 0  # Hide the bar during break
         else:
             self.bar.opacity = 1  # Show the bar
 
@@ -294,15 +301,16 @@ class SweepingBarStimulus:
                 self.bar.pos = (self.fov_size / 2 + self.bar_width / 2 - t, 0)
                 self.bar.ori = 0  # ✅ Keep bar horizontal
             elif direction == "down":
-                self.bar.pos = (0, self.fov_size / 2 - self.bar_width / 2 - t)
+                self.bar.pos = (0, self.fov_size  - self.bar_width / 2 - t)
                 self.bar.ori = 90  # ✅ Rotate bar 90° for vertical movement
             elif direction == "up":
-                self.bar.pos = (0, -self.fov_size / 2 + self.bar_width / 2 + t)
+                self.bar.pos = (0, -self.fov_size + self.bar_width / 2 + t)
                 self.bar.ori = 90  # ✅ Rotate bar 90° for vertical movement
 
         # ✅ Check if it's time to switch direction
-        if (direction != "rest" and self.sweep_clock.getTime() >= self.sweep_duration) or \
-           (direction == "rest" and self.sweep_clock.getTime() >= self.rest_duration):
+        if ((direction != "rest" and direction != "break") and self.sweep_clock.getTime() >= self.sweep_duration) or \
+           (direction == "rest" and self.sweep_clock.getTime() >= self.rest_duration) or \
+           (direction == "break" and self.sweep_clock.getTime() >= self.break_duration):
             self.switch_direction()
 
     def flicker(self):
