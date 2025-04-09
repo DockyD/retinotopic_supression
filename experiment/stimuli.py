@@ -17,7 +17,7 @@ class TargetStimulus(object):
             fillColor=self._color, lineColor=None, ori=self._ori
         )
         self.dot = visual.Circle(
-            win=win, pos=self._pos, radius=self._size / 15, fillColor='black', lineColor=None
+            win=win, pos=self._pos, radius=self._size / 15, fillColor='grey', lineColor=None
         )
 
     def update(self, target=None, color=None, ori=None, pos=None, size=None):
@@ -121,13 +121,14 @@ class TargetStimulusArray(object):
 
         assert distractor_color in ['red', 'green']
         # assert 0 <= distractor_location < self.n_objects
-        assert 0 <= target_location < self.n_objects
+        # assert 0 <= target_location < self.n_objects
 
         other_color = (0.78,0.14,-1) if distractor_color == 'green' else (-1, 0.33, -1)
         distractor_color = (0.78,0.14,-1)  if distractor_color == 'red' else (-1, 0.33, -1)
         other_orientation = 90. if target_orientation == 0.0 else 0.0
 
         print(f'Setting up trial: distractor={distractor_location},\ntarget={target_location},\ndistractor_color={distractor_color},\ntarget_orientation={target_orientation}\n other_color={other_color},\nother_orientation={other_orientation}')
+        # eyetracker.log('Onset search {}'.format(var.nr_trials))
 
         for ix, stimulus in enumerate(self.stimuli):
             if ix == distractor_location:

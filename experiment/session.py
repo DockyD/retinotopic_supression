@@ -62,14 +62,35 @@ class SingletonSession(PylinkEyetrackerSession):
     def create_trials(self, most_likely_distractor_location, include_instructions=True):
         """Create trials."""
 
+        if include_instructions:
+            instruction_entries = [
+                self.instructions['intro'],
+                self.instructions['example1'],
+                self.instructions['example2'],
+                self.instructions['example3'],
+                self.instructions['fix'],
+                self.instructions['summary'],
+                self.instructions['reminder']
+            ]
 
-        instruction_trials = [InstructionTrial(self, 0, self.instructions['intro'].format(run=self.settings['run']))]
+            instruction_trials = []
+            for i, entry in enumerate(instruction_entries):
+                # Handle either plain string or dict with 'text' and optional 'image'
+                if isinstance(entry, dict):
+                    text = entry['text'].format(run=self.settings['run'])
+                    image_path = entry.get('image', None)
+                else:
+                    text = entry.format(run=self.settings['run'])
+                    image_path = None
 
-        
-        self.trials = instruction_trials
+                instruction_trials.append(
+                    InstructionTrial(self, i, txt=text, image_path=image_path)
+                )
 
-        if not include_instructions:
+            self.trials = instruction_trials
+        else:
             self.trials = []
+
 
         possible_itis = self.settings['durations']['iti']
         n_trials = self.settings['design']['n_trials']
@@ -78,7 +99,16 @@ class SingletonSession(PylinkEyetrackerSession):
         indices.remove(most_likely_distractor_location)
         indices.insert(0,most_likely_distractor_location)
 
+        #for the dot version
         t_d_locs = [(t,d) for t in [0,0,0,0,1,2,3] for d in [0,0,0,0,0,0,0,0,0,0,1,2,3] if t != d] + [(t,d) for t in [0,1,2,3] for d in [4]] * 3
+
+        # #for present/absent version
+        # t_present_d_present = [(t,d) for t in [0,1,2,3] for d in [0,0,0,0,0,0,0,1,2,3] if t != d]
+        # t_present_d_absent = [(t,4) for t in [0,1,2,3]] * 2
+        # t_absent_d_present = [(4,d) for d in [0,0,0,0,0,0,0,1,2,3]] * 2
+        # t_absent_d_absent = [(4,4)] * 2
+        # t_d_locs = t_present_d_present + t_present_d_absent + t_absent_d_present + t_absent_d_absent
+
         np.random.shuffle(t_d_locs)
 
         # Assert n_trials is multiple of possible_itis

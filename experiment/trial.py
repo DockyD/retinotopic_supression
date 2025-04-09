@@ -1,12 +1,13 @@
 from exptools2.core import Trial
-from psychopy.visual import TextStim
+from psychopy.visual import TextStim,ImageStim
 import numpy as np
 from psychopy import core
+import os.path as op
 
 
 class InstructionTrial(Trial):
 
-    def __init__(self, session, trial_nr, txt, bottom_txt=None, keys=None, phase_durations=None, 
+    def __init__(self, session, trial_nr, txt, bottom_txt=None, image_path=None, keys=None, phase_durations=None, 
                  phase_names=None, **kwargs):
 
         self.keys = keys
@@ -36,6 +37,16 @@ class InstructionTrial(Trial):
         self.text2 = TextStim(session.win, bottom_txt, pos=(
             0.0, -6.0), height=txt_height, wrapWidth=txt_width,
             color=txt_color)
+        
+        self.image = None
+        if image_path and op.exists(image_path):
+            self.image = ImageStim(
+                session.win,
+                image=image_path,
+                pos=(0, 0),  
+                size=(10,10),  
+                units='deg'
+            )
 
     def get_events(self):
 
@@ -52,6 +63,8 @@ class InstructionTrial(Trial):
     def draw(self):
         self.text.draw()
         self.text2.draw()
+        if self.image:
+            self.image.draw()
 
 
 class SingletonTrial(Trial):
@@ -90,8 +103,16 @@ class SingletonTrial(Trial):
             self.parameters['distractor_location'] = distractor_location
 
         if dot_presence is None:
-            self.parameters['dot_presence'] = ([True] * 4) + ([False] * 4)
-            np.random.shuffle(self.parameters['dot_presence'])
+            #to ensure always and only 2 dots on the possible target locations
+            dot_presence = [False] * 8  
+            for i in np.random.choice([0, 2, 4, 6], 2, replace=False):
+                dot_presence[i] = True
+            for i in np.random.choice([1, 3, 5, 7], 2, replace=False):
+                dot_presence[i] = True
+            self.parameters['dot_presence'] = dot_presence
+
+            # self.parameters['dot_presence'] = ([True] * 4) + ([False] * 4)
+            # np.random.shuffle(self.parameters['dot_presence'])
         else:
             self.parameters['dot_presence'] = dot_presence
 
@@ -102,7 +123,16 @@ class SingletonTrial(Trial):
 
         self.parameters['correct'] = np.nan
         self.responded = False
+
+        #for the dot version
         self.parameters['correct_response'] = self.parameters['dot_presence'][self.parameters['target_location']]
+
+        # for present/absent version
+        # if self.parameters['target_location'] < 9:
+        #     self.parameters['correct_response'] = True
+        # else:
+        #     self.parameters['correct_response'] = False
+
         self.stimulus_onset = None
 
     

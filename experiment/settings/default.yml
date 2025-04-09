@@ -45,4 +45,6 @@ various:
 
 bar_stimulus:
   bar_width: 1.5
-  speed: 1.
+  speed: 0.5
+
+# eyetracker:True
