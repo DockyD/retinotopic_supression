@@ -220,7 +220,7 @@ plugins.loadPlugin('psychopy_visionscience')
 from psychopy import visual, core, event
 
 class SweepingBarStimulus:
-    def __init__(self, win, session, fov_size=20, bar_width=2, speed=2, rest_duration=2, break_duration=18):
+    def __init__(self, win, session, fov_size=20, bar_width=2, speed=2, rest_duration=2, break_duration=10):
         """
         Creates a sweeping checkerboard bar stimulus that properly rotates for vertical motion.
 
