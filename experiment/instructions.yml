@@ -154,8 +154,18 @@ example3:
   image: images/withBar.png
   
 
-reminder: |
-  - REMINDER -
+fix: |
+  - SUMMARY -
+
+  Sometimes there will be a long break between
+  search trials (a couple seconds).
+  You will know that a search trial is about
+  to begin because the fixation dot will flash
+  blue
+
+
+summary: |
+  - SUMMARY -
 
   So thats it! Your job is to identify the
   bar with a unique orientation and report
@@ -168,13 +178,22 @@ reminder: |
   the screen. This is unrelated to your
   task and can be ignored.
 
-  Now, what is extremely important for this
-  experiment is that you.
+  Press space bar to start the real trials.
+
+reminder: |
+
+  - REMINDER -
+
+  While doing this task it is extremely important 
+  that you.
   DONT MOVE YOUR EYES!
 
   If you move your eyes then we will need
   to throw out that trial! It is always
   better to get a trial wrong than to move
   your eyes.
+
+  Now if you are ready, lets start with some 
+  example trials.
 
   Press space bar to start the real trials.
