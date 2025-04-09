@@ -4,9 +4,10 @@ import numpy as np
 import os.path as op
 import yaml
 from pathlib import Path
-from trial import InstructionTrial, SingletonTrial
+from trial import InstructionTrial, SingletonTrial, SingletonTrial_training
 from psychopy import visual, core
 from IPython import embed
+from psychopy.sound import Sound
 
 
 class SingletonSession(PylinkEyetrackerSession):
@@ -44,6 +45,14 @@ class SingletonSession(PylinkEyetrackerSession):
 
         self.rt_clock = core.Clock()
 
+        self.pix_per_deg = self.win.size[0] / self.win.monitor.getWidth()
+        self.soundfile = Path(__file__).parent / "countdown.wav"
+        self.beep = Sound(str(self.soundfile))
+        self.beep.setSound(800, secs=0.1)
+        # self.beep = Sound('A', secs=0.1)
+        self.beep.play()
+        
+        
     def run(self):
         """ Runs experiment. """
         if self.eyetracker_on and self.show_eyetracker_calibration:
@@ -119,5 +128,9 @@ class SingletonSession(PylinkEyetrackerSession):
         np.random.shuffle(itis)
 
         # embed()
-        for ix, iti in enumerate(itis):
-            self.trials.append(SingletonTrial(self, ix+1, iti=iti, distractor_location=indices[t_d_locs[ix][1]], target_location=indices[t_d_locs[ix][0]],most_likely_distractor_location=most_likely_distractor_location))
+        if str(self.settings['session']) == "A":
+            for ix, iti in enumerate(itis):
+                self.trials.append(SingletonTrial_training(self, ix+1, iti=iti, distractor_location=indices[t_d_locs[ix][1]], target_location=indices[t_d_locs[ix][0]],most_likely_distractor_location=most_likely_distractor_location))
+        else:
+            for ix, iti in enumerate(itis):
+                self.trials.append(SingletonTrial(self, ix+1, iti=iti, distractor_location=indices[t_d_locs[ix][1]], target_location=indices[t_d_locs[ix][0]],most_likely_distractor_location=most_likely_distractor_location))
