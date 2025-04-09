@@ -3,6 +3,7 @@ from psychopy.visual import TextStim,ImageStim
 import numpy as np
 from psychopy import core
 import os.path as op
+import psychtoolbox as ptb
 
 
 class InstructionTrial(Trial):
@@ -182,3 +183,71 @@ class SingletonTrial(Trial):
                     self.parameters['rt'] = t - self.stimulus_onset
                     self.parameters['correct'] = bool(keys.index(self.parameters['response'])) == self.parameters['correct_response']
                     self.responded = True
+
+
+class SingletonTrial_training(SingletonTrial):
+    def __init__(self, session, trial_nr, iti,
+                distractor_location=None,
+                target_location=None,
+                distractor_color=None,
+                target_orientation=None,
+                dot_presence=None,
+                most_likely_distractor_location=1,
+                  **kwargs):
+
+        super().__init__(session, trial_nr, iti, distractor_location=distractor_location,
+                         target_location=target_location, distractor_color=distractor_color,
+                         target_orientation=target_orientation, dot_presence=dot_presence,
+                         most_likely_distractor_location=most_likely_distractor_location, **kwargs)
+        self.audio_played = False
+   
+    def draw(self):
+
+        if self.phase == 0:
+            self.session.fixation_dot.color = 'blue'
+        elif self.phase == 1:
+            self.session.fixation_dot.color = 'white'
+
+        if self.phase == 2:
+            if self.stimulus_onset is None:
+                self.stimulus_onset = core.getTime()
+
+            self.session.target_stimuli.draw()
+            
+            if self.session.eyetracker_on and self.session.settings["various"]["eyemovements_alert"]:
+                el_smp = self.session.tracker.getNewestSample()
+                if el_smp != None:
+                    if el_smp.isLeftSample():
+                        sample = np.array(el_smp.getLeftEye().getGaze())
+                    elif el_smp.isRightSample():
+                        sample = np.array(el_smp.getRightEye().getGaze())
+                    fix_dist_pix = np.linalg.norm(
+                        (np.array(self.session.win.size) / 2) -
+                        np.array(sample)
+                    )
+                    fix_dist_deg = fix_dist_pix / self.session.pix_per_deg
+                    if (
+                        fix_dist_deg
+                        > self.session.settings["various"]["gaze_threshold_deg"]
+                    ):
+                        self.session.fixation.circle.color = [
+                            1, -1, -1]
+                        if not self.audio_played:
+                            now = ptb.GetSecs()
+                            self.session.beep.play(when=now+0.01)
+                            if ptb.GetSecs() - now > 0.2:
+                                self.session.beep.stop()
+                            self.audio_played = True
+
+        self.session.sweeping_bars.draw()
+
+        if self.phase == 3:
+            if (not self.responded) or (not self.parameters['correct']):
+                self.session.error_stimulus.draw()
+            else:
+                if self.session.settings['experiment'].get('show_correct_feedback', False):
+                    self.session.correct_stimulus.draw()
+                else:
+                    self.session.fixation_dot.draw()
+        else:
+            self.session.fixation_dot.draw()

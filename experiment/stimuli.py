@@ -279,7 +279,7 @@ class SweepingBarStimulus:
         self.session.global_log.loc[idx, 'onset'] = onset
         self.session.global_log.loc[idx, 'event_type'] = f'bar_{self.directions[self.current_direction_index]}'
         self.session.global_log.loc[idx, 'nr_frames'] = 0
-        print(self.session.global_log)
+        # print(self.session.global_log)
 
 
     def update_position(self):

@@ -16,13 +16,13 @@ def main(subject, session, run, settings='default', calibrate_eyetracker=False, 
     output_dir, output_str = get_output_dir_str(subject, session, 'estimation_task', run)
     settings_fn, use_eyetracker = get_settings(settings)
 
-    session = SingletonSession(output_str=output_str, subject=subject,
+    run_session = SingletonSession(output_str=output_str, subject=subject, session=session,
                           output_dir=output_dir, settings_file=settings_fn, 
                           run=run, eyetracker_on=use_eyetracker,
                           calibrate_eyetracker=calibrate_eyetracker)
 
-    session.create_trials(most_likely_distractor_location=most_likely_distractor_location)
-    session.run()
+    run_session.create_trials(most_likely_distractor_location=most_likely_distractor_location)
+    run_session.run()
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()

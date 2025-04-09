@@ -42,6 +42,8 @@ various:
   text_width: 15
   text_height: .5
   text_color: [1, 1, 1]
+  eyemovements_alert: True
+  gaze_threshold_deg: 1
 
 bar_stimulus:
   bar_width: 1.5
