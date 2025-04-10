@@ -1,3 +1,5 @@
+import psychopy
+psychopy.prefs.hardware['audioLib'] = ['ptb', 'pyo', 'pygame']
 from exptools2.core import Session, PylinkEyetrackerSession
 from stimuli import CueStimulusArray, SweepingBarStimulus, FixationStimulus, TargetStimulusArray
 import numpy as np
@@ -7,7 +9,8 @@ from pathlib import Path
 from trial import InstructionTrial, SingletonTrial, SingletonTrial_training
 from psychopy import visual, core
 from IPython import embed
-from psychopy.sound import Sound
+from psychopy import sound
+from psychopy.sound import Sound 
 
 
 class SingletonSession(PylinkEyetrackerSession):
@@ -46,11 +49,16 @@ class SingletonSession(PylinkEyetrackerSession):
         self.rt_clock = core.Clock()
 
         self.pix_per_deg = self.win.size[0] / self.win.monitor.getWidth()
-        self.soundfile = Path(__file__).parent / "countdown.wav"
+        self.soundfile = str(Path(__file__).parent / "beep.wav")
         self.beep = Sound(str(self.soundfile))
-        self.beep.setSound(800, secs=0.1)
+        self.beep.setSound(800, secs=0.02)
         # self.beep = Sound('A', secs=0.1)
         self.beep.play()
+        core.wait(0.5)
+        self.beep.stop()
+        self.beep.play()
+        core.wait(0.02)
+        self.beep.stop()
         
         
     def run(self):
@@ -109,7 +117,10 @@ class SingletonSession(PylinkEyetrackerSession):
         indices.insert(0,most_likely_distractor_location)
 
         #for the dot version
-        t_d_locs = [(t,d) for t in [0,0,0,0,1,2,3] for d in [0,0,0,0,0,0,0,0,0,0,1,2,3] if t != d] + [(t,d) for t in [0,1,2,3] for d in [4]] * 3
+        if reg:
+            t_d_locs = [(t,d) for t in [0,0,0,0,1,2,3] for d in [0,0,0,0,0,0,0,0,0,0,1,2,3] if t != d] + [(t,d) for t in [0,1,2,3] for d in [4]] * 3
+        elif ~reg:
+            t_d_locs = [(t,d) for t in [0,1,2,3] for d in [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3] if t != d] + [(t,d) for t in [0,1,2,3] for d in [4]] * 3
 
         # #for present/absent version
         # t_present_d_present = [(t,d) for t in [0,1,2,3] for d in [0,0,0,0,0,0,0,1,2,3] if t != d]
