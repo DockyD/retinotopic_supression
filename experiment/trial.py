@@ -4,6 +4,7 @@ import numpy as np
 from psychopy import core
 import os.path as op
 import psychtoolbox as ptb
+from playsound import playsound
 
 
 class InstructionTrial(Trial):
@@ -226,17 +227,16 @@ class SingletonTrial_training(SingletonTrial):
                         np.array(sample)
                     )
                     fix_dist_deg = fix_dist_pix / self.session.pix_per_deg
+                    # print(f"played: {self.audio_played}, fix_dist_deg: {fix_dist_deg}, fix_dist_pix: {fix_dist_pix}, pix_per_deg: {self.session.pix_per_deg}")
                     if (
                         fix_dist_deg
                         > self.session.settings["various"]["gaze_threshold_deg"]
                     ):
-                        self.session.fixation.circle.color = [
-                            1, -1, -1]
                         if not self.audio_played:
-                            now = ptb.GetSecs()
-                            self.session.beep.play(when=now+0.01)
-                            if ptb.GetSecs() - now > 0.2:
-                                self.session.beep.stop()
+                            self.session.beep.play()
+                            core.wait(0.03)
+                            self.session.beep.stop()
+                            # playsound(self.session.soundfile)
                             self.audio_played = True
 
         self.session.sweeping_bars.draw()
