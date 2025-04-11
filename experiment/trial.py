@@ -238,6 +238,7 @@ class SingletonTrial_training(SingletonTrial):
                             self.session.beep.stop()
                             # playsound(self.session.soundfile)
                             self.audio_played = True
+                            self.session.beep_count += 1
 
         self.session.sweeping_bars.draw()
 
