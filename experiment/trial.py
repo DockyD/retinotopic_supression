@@ -26,9 +26,12 @@ class InstructionTrial(Trial):
         txt_width = self.session.settings['various'].get('text_width')
         txt_color = self.session.settings['various'].get('text_color')
 
-        self.text = TextStim(session.win, txt,
-                             pos=(0.0, 0.0), height=txt_height, wrapWidth=txt_width, color=txt_color)
-
+        if image_path:
+            self.text = TextStim(session.win, txt,
+                                pos=(-6.0, 0.0), height=txt_height, wrapWidth=txt_width, color=txt_color)
+        else:
+            self.text = TextStim(session.win, txt,
+                                pos=(0.0, 0.0), height=txt_height, wrapWidth=txt_width, color=txt_color)
 
         print(self.text)
         print(txt)
@@ -41,11 +44,17 @@ class InstructionTrial(Trial):
             color=txt_color)
         
         self.image = None
-        if image_path and op.exists(image_path):
+        print(f"Trying to load image: {image_path}")
+        if image_path:
+            print("Exists?", op.exists(image_path))
+        else:
+            print("No image provided.")
+        
+        if image_path is not None and op.exists(image_path):
             self.image = ImageStim(
                 session.win,
                 image=image_path,
-                pos=(0, 0),  
+                pos=(6, 0),  
                 size=(10,10),  
                 units='deg'
             )
@@ -63,10 +72,11 @@ class InstructionTrial(Trial):
                     self.stop_phase()
 
     def draw(self):
-        self.text.draw()
-        self.text2.draw()
         if self.image:
             self.image.draw()
+        self.text.draw()
+        self.text2.draw()
+
 
 
 class SingletonTrial(Trial):
@@ -127,6 +137,8 @@ class SingletonTrial(Trial):
         self.responded = False
 
         #for the dot version
+        # print(self.parameters['dot_presence'])
+        # print(self.parameters['target_location'])
         self.parameters['correct_response'] = self.parameters['dot_presence'][self.parameters['target_location']]
 
         # for present/absent version
@@ -140,10 +152,14 @@ class SingletonTrial(Trial):
     
     def draw(self):
 
-        if self.phase == 0:
-            self.session.fixation_dot.color = 'blue'
-        elif self.phase == 1:
-            self.session.fixation_dot.color = 'white'
+        # #if cue that search is about to start
+        # if self.phase == 0:
+        #     self.session.fixation_dot.color = 'blue'
+        # elif self.phase == 1:
+        #     self.session.fixation_dot.color = 'white'
+
+        self.session.fixation_dot.color = 'white'
+
 
         if self.phase == 2:
             if self.stimulus_onset is None:
@@ -227,7 +243,7 @@ class SingletonTrial_training(SingletonTrial):
                         np.array(sample)
                     )
                     fix_dist_deg = fix_dist_pix / self.session.pix_per_deg
-                    # print(f"played: {self.audio_played}, fix_dist_deg: {fix_dist_deg}, fix_dist_pix: {fix_dist_pix}, pix_per_deg: {self.session.pix_per_deg}")
+                    print(f"played: {self.audio_played}, fix_dist_deg: {fix_dist_deg}, fix_dist_pix: {fix_dist_pix}, pix_per_deg: {self.session.pix_per_deg}")
                     if (
                         fix_dist_deg
                         > self.session.settings["various"]["gaze_threshold_deg"]
@@ -251,3 +267,29 @@ class SingletonTrial_training(SingletonTrial):
                     self.session.fixation_dot.draw()
         else:
             self.session.fixation_dot.draw()
+
+
+class BlankTrial(Trial):
+
+    def __init__(self, session, trial_nr,
+                  **kwargs):
+
+
+        blank_duration = session.settings['durations'].get('blank', 1)
+        phase_durations = [blank_duration]
+        phase_names = ['blank']
+
+        super().__init__(session, trial_nr, phase_durations=phase_durations, phase_names=phase_names, **kwargs)
+
+        self.parameters['correct'] = np.nan
+        self.responded = False
+        self.stimulus_onset = None
+
+    
+    def draw(self):
+        self.session.backgroundcircle.draw()
+        self.session.fixation_dot.color = 'white'
+        self.session.fixation_dot.draw()
+
+    def run(self):
+        super().run()

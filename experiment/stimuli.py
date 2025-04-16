@@ -156,7 +156,7 @@ class TargetStimulusArray(object):
 from psychopy import visual
 
 class FixationStimulus:
-    def __init__(self, win, position=(0, 0), size=0.5, color='black', cross_color='white', cross_thickness=2):
+    def __init__(self, win, position=(0, 0), size=0.5, color='grey', cross_color='black', cross_thickness=2):
         """
         A fixation stimulus with a dot and optional cross.
 
@@ -178,18 +178,23 @@ class FixationStimulus:
             edges=128
         )
 
+        self.minidot = visual.Circle(
+            win=win, pos=self.position, radius=self.size / 4, fillColor=self.color, lineColor=None,
+            edges=128
+        )
+
         # Cross lines for better visibility
-        # cross_length = self.size * 2  # Length of the cross arms
-        # self.h_line = visual.Line(
-        #     win=win, start=(position[0] - cross_length / 2, position[1]), 
-        #     end=(position[0] + cross_length / 2, position[1]),
-        #     lineColor=cross_color, lineWidth=cross_thickness
-        # )
-        # self.v_line = visual.Line(
-        #     win=win, start=(position[0], position[1] - cross_length / 2), 
-        #     end=(position[0], position[1] + cross_length / 2),
-        #     lineColor=cross_color, lineWidth=cross_thickness
-        # )
+        cross_length = self.size  # Length of the cross arms
+        self.h_line = visual.Line(
+            win=win, start=(position[0] - cross_length / 2, position[1]), 
+            end=(position[0] + cross_length / 2, position[1]),
+            lineColor=cross_color, lineWidth=cross_thickness
+        )
+        self.v_line = visual.Line(
+            win=win, start=(position[0], position[1] - cross_length / 2), 
+            end=(position[0], position[1] + cross_length / 2),
+            lineColor=cross_color, lineWidth=cross_thickness
+        )
 
     def draw(self, cross=True):
         """
@@ -197,10 +202,13 @@ class FixationStimulus:
 
         :param cross: Whether to draw the cross lines (default: True)
         """
-        # if cross:
-        #     self.h_line.draw()
-        #     self.v_line.draw()
         self.dot.draw()
+        
+        if cross:
+            self.h_line.draw()
+            self.v_line.draw()
+
+        self.minidot.draw()
 
     @property
     def color(self):
@@ -302,10 +310,10 @@ class SweepingBarStimulus:
                 self.bar.pos = (self.fov_size / 2 + self.bar_width / 2 - t, 0)
                 self.bar.ori = 0  # ✅ Keep bar horizontal
             elif direction == "down":
-                self.bar.pos = (0, self.fov_size  - self.bar_width / 2 - t)
+                self.bar.pos = (0, self.fov_size / 2  + self.bar_width / 2 - t)
                 self.bar.ori = 90  # ✅ Rotate bar 90° for vertical movement
             elif direction == "up":
-                self.bar.pos = (0, -self.fov_size + self.bar_width / 2 + t)
+                self.bar.pos = (0, -self.fov_size / 2 - self.bar_width / 2 + t)
                 self.bar.ori = 90  # ✅ Rotate bar 90° for vertical movement
 
         # ✅ Check if it's time to switch direction
@@ -331,6 +339,20 @@ class SweepingBarStimulus:
         self.aperture.enabled = False  # ✅ Disable aperture so it doesn’t affect other stimuli
 
         self.background_circle.draw()
+
+
+class BackgroundCircle:
+    def __init__(self, win, session, fov_size=20):
+        self.win = win
+        self.session = session
+        self.fov_size = fov_size
+        self.background_circle = visual.Circle(
+            win, radius=fov_size / 2.0, fillColor=None, lineColor='darkgray', lineWidth=5.0, pos=(0, 0)
+        )
+        
+    def draw(self):
+        self.background_circle.draw()
+
 
 class CueStimulusArray:
     

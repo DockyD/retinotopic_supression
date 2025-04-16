@@ -30,34 +30,6 @@ example1:
 
     Notice that there is a grey dot inside this line? On this trial,
     a correct answer would be to press the 'j' button.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    --
   image: images/noDist.png
 
 example2:
@@ -77,37 +49,6 @@ example2:
 
     On this trial, your target doesnt have a grey dot inside it.
     The correct answer on this trial is therefore to press the 'f' button
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    --
   image: images/withDist.png
 
 example3:
@@ -122,35 +63,6 @@ example3:
     We use this checkardboard to measure your visual system
     while you are doing the task. You can ask the experimenter
     for more information about this if you are interested.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    --
   image: images/withBar.png
   
 
@@ -158,10 +70,11 @@ fix: |
   - SUMMARY -
 
   Sometimes there will be a long break between
-  search trials (a couple seconds).
-  You will know that a search trial is about
-  to begin because the fixation dot will flash
-  blue
+  search trials (a couple seconds). So just wait!
+
+  Notably, the block will start with 20 seconds of just fixation,
+  so just at the begining, expect to just
+  stare at the fixation dot for a while and wait for the trials to start :)
 
 
 summary: |
@@ -193,7 +106,29 @@ reminder: |
   better to get a trial wrong than to move
   your eyes.
 
-  Now if you are ready, lets start with some 
-  example trials.
+  Now if you are ready, lets start the trials!
 
   Press space bar to start the real trials.
+
+break: |
+  - TIME FOR A BREAK! -
+
+  You have just completed a block of trials. Great job!
+
+  Take a moment to rest your eyes.
+
+  Press space bar to start the next block of trials.
+
+return: |
+  - WELCOME BACK! -
+
+  Weclome to the MRI sessions of this experiment!
+  The fact that you are here means that you were very 
+  good at keeping your eyes still. So you should
+  be proud of that!!
+
+  We will now do eight blocks of the exact same
+  task you did in the eyetracker labs, but now you
+  are laying in a big magnet.
+
+  Press any button to jump back into the task!
