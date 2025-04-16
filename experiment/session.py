@@ -74,7 +74,6 @@ class SingletonSession(PylinkEyetrackerSession):
             self.start_recording_eyetracker()
 
         for trial in self.trials:
-            print("##################################################################")
             trial.run()
         
         # self.close()
@@ -173,7 +172,7 @@ class SingletonSession(PylinkEyetrackerSession):
         self.trials.append(BlankTrial(self, 0))
 
         # embed()
-        if str(self.settings['session']) == "A":
+        if str(self.settings['session']) == 0:
             for ix, iti in enumerate(itis):
                 self.trials.append(SingletonTrial_training(self, ix+1, iti=iti, distractor_location=indices[t_d_locs[ix][1]], target_location=indices[t_d_locs[ix][0]],most_likely_distractor_location=most_likely_distractor_location))
         else:

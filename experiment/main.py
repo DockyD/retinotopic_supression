@@ -26,7 +26,7 @@ def main(subject, session, run, settings='default', use_eyetracker=True):
     calibrate_eyetracker=True
 
     # hp_list = [10,10,10,10]
-    hp_list = [1,5] ## for our pilot experiments
+    hp_list = [3,7] ## for our pilot experiments
 
     if session > 0:
         hp_list = ([1,5,3,7],
@@ -38,7 +38,7 @@ def main(subject, session, run, settings='default', use_eyetracker=True):
                      [3,7,5,1],
                      [7,3,5,1])[subject%8-1]
 
-    most_likely_distractor_location = hp_list[run//4-1]
+    most_likely_distractor_location = hp_list[run//3-1]
     output_dir, output_str = get_output_dir_str(subject, session, 'estimation_task', run)
     settings_fn, use_eyetracker = get_settings(settings)
     include_instructions = False

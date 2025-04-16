@@ -160,10 +160,9 @@ class SingletonTrial(Trial):
 
         self.session.fixation_dot.color = 'white'
 
-
         if self.phase == 2:
             if self.stimulus_onset is None:
-                self.stimulus_onset = core.getTime()
+                self.stimulus_onset = self.session.clock.getTime()
 
             self.session.target_stimuli.draw()
 
