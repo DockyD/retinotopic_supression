@@ -3,8 +3,6 @@ from psychopy.visual import TextStim,ImageStim
 import numpy as np
 from psychopy import core
 import os.path as op
-import psychtoolbox as ptb
-from playsound import playsound
 
 
 class InstructionTrial(Trial):
