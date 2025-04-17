@@ -54,6 +54,7 @@ def main(subject, session, run, settings='default', use_eyetracker=True):
 
     run_session.create_trials(most_likely_distractor_location=most_likely_distractor_location, include_instructions=include_instructions)
     run_session.run()
+    print(f"Eyemovements: {run_session.beep_count} trials")
 
 # if __name__ == "__main__":
 #     argparser = argparse.ArgumentParser()

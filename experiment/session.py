@@ -61,6 +61,7 @@ class SingletonSession(PylinkEyetrackerSession):
         self.beep.play()
         core.wait(0.02)
         self.beep.stop()
+        self.beep_count = 0
         
         
     def run(self):
