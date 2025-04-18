@@ -309,6 +309,18 @@ class SingletonSession(PylinkEyetrackerSession):
                 )
 
         # self.trials.append(BlankTrial(self, ix + 2))
+        self.trials.append(
+            OutroTrial(
+                session=self,
+                trial_nr=ix + 3,
+                phase_durations=[
+                    self.settings["durations"].get("blank", 1),
+                    0.10,
+                ],
+                phase_names=["outro_dummy_scan", "end_exp"],
+                draw_each_frame=False,
+            )
+        )
 
         # show either a break screen or the end of experiment screen. Assumes 6 runs per session
         if (self.settings["run"] == 6) or (self.settings["run"] == 12):
@@ -329,15 +341,4 @@ class SingletonSession(PylinkEyetrackerSession):
                 )
             )
 
-        self.trials.append(
-            OutroTrial(
-                session=self,
-                trial_nr=ix + 3,
-                phase_durations=[
-                    self.settings["durations"].get("blank", 1),
-                    0.10,
-                ],
-                phase_names=["outro_dummy_scan", "end_exp"],
-                draw_each_frame=False,
-            )
-        )
+        
