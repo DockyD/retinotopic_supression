@@ -275,7 +275,7 @@ class SingletonSession(PylinkEyetrackerSession):
 
         start_trial = WaitStartTriggerTrial(
             session=self,
-            trial_nr=1,
+            trial_nr=0,
             phase_durations=[np.inf],
             draw_each_frame=False,
         )
@@ -312,11 +312,11 @@ class SingletonSession(PylinkEyetrackerSession):
 
         # show either a break screen or the end of experiment screen. Assumes 6 runs per session
         if (self.settings["run"] == 6) or (self.settings["run"] == 12):
-            entry = self.instructions["fix"]
+            entry = self.instructions["fin"]
             text = entry.format(run=self.settings["run"])
             self.trials.append(
                 InstructionTrial(
-                    self, self.instructions["fix"], txt=text, image_path=None
+                    self, self.instructions["fin"], txt=text, image_path=None
                 )
             )
 
