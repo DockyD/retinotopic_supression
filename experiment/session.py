@@ -1,52 +1,111 @@
 import psychopy
-psychopy.prefs.hardware['audioLib'] = ['ptb', 'pyo', 'pygame']
+
+psychopy.prefs.hardware["audioLib"] = ["ptb", "pyo", "pygame"]
 from exptools2.core import Session, PylinkEyetrackerSession
-from stimuli import CueStimulusArray, SweepingBarStimulus, FixationStimulus, TargetStimulusArray, BackgroundCircle
+from stimuli import (
+    CueStimulusArray,
+    SweepingBarStimulus,
+    FixationStimulus,
+    TargetStimulusArray,
+    BackgroundCircle,
+)
 import numpy as np
 import os.path as op
 import yaml
 from pathlib import Path
-from trial import InstructionTrial, SingletonTrial, SingletonTrial_training, BlankTrial
+from trial import (
+    InstructionTrial,
+    SingletonTrial,
+    SingletonTrial_training,
+    BlankTrial,
+    DummyWaiterTrial,
+    WaitStartTriggerTrial,
+    OutroTrial,
+)
 from psychopy import visual, core
 from IPython import embed
 from psychopy import sound
-from psychopy.sound import Sound 
+from psychopy.sound import Sound
 
 
 class SingletonSession(PylinkEyetrackerSession):
 
-    def __init__(self, output_str, subject=None, session=None, output_dir=None, settings_file=None, run=None, eyetracker_on=False, calibrate_eyetracker=False,
-                 n_trials=10):
+    def __init__(
+        self,
+        output_str,
+        subject=None,
+        session=None,
+        output_dir=None,
+        settings_file=None,
+        run=None,
+        eyetracker_on=False,
+        calibrate_eyetracker=False,
+        n_trials=10,
+    ):
 
-        super().__init__(output_str, output_dir=output_dir, settings_file=settings_file, eyetracker_on=eyetracker_on)
-
+        super().__init__(
+            output_str,
+            output_dir=output_dir,
+            settings_file=settings_file,
+            eyetracker_on=eyetracker_on,
+        )
+        self.mri_trigger = "t"
         self.show_eyetracker_calibration = calibrate_eyetracker
 
-        self.instructions = yaml.safe_load((Path(__file__).parent / "instructions.yml").read_text())
+        self.instructions = yaml.safe_load(
+            (Path(__file__).parent / "instructions.yml").read_text()
+        )
         print(self.instructions)
 
-        self.settings['subject'] = subject
-        self.settings['session'] = session
-        self.settings['run'] = run
+        self.settings["subject"] = subject
+        self.settings["session"] = session
+        self.settings["run"] = run
         # self.settings['n_trials'] = n_trials
 
-        self.eccentricity_stimuli = self.settings['experiment'].get('eccentricity_stimulus', 5)
-        self.size_stimuli = self.settings['experiment'].get('size_stimuli', 1)
+        self.eccentricity_stimuli = self.settings["experiment"].get(
+            "eccentricity_stimulus", 5
+        )
+        self.size_stimuli = self.settings["experiment"].get("size_stimuli", 1)
         self.radius_bar_aperture = self.eccentricity_stimuli - self.size_stimuli / 1.8
 
+        self.fixation_dot = FixationStimulus(
+            self.win, size=self.settings["experiment"]["size_fixation"]
+        )
+        self.sweeping_bars = SweepingBarStimulus(
+            self.win,
+            session=self,
+            speed=self.settings["bar_stimulus"]["speed"],
+            fov_size=self.radius_bar_aperture * 2,
+            #  bar_width=self.settings['bar_stimulus']['bar_width'],)
+            bar_width=(self.radius_bar_aperture * 2) / 8,
+        )
+        self.backgroundcircle = BackgroundCircle(
+            self.win,
+            session=self,
+            fov_size=self.radius_bar_aperture * 2,
+        )
 
-        self.fixation_dot = FixationStimulus(self.win, size=self.settings['experiment']['size_fixation'])
-        self.sweeping_bars = SweepingBarStimulus(self.win, session=self,
-                                                 speed=self.settings['bar_stimulus']['speed'], fov_size=self.radius_bar_aperture * 2,
-                                                #  bar_width=self.settings['bar_stimulus']['bar_width'],)
-                                                 bar_width=(self.radius_bar_aperture * 2)/8,)
-        self.backgroundcircle = BackgroundCircle(self.win, session=self, fov_size=self.radius_bar_aperture * 2,)
+        self.target_stimuli = TargetStimulusArray(
+            self.win,
+            eccentricity=self.eccentricity_stimuli,
+            stimulus_size=self.size_stimuli,
+        )
+        self.cue_stimuli = CueStimulusArray(
+            self.win, self.eccentricity_stimuli, self.size_stimuli
+        )
 
-        self.target_stimuli = TargetStimulusArray(self.win, eccentricity=self.eccentricity_stimuli, stimulus_size=self.size_stimuli)
-        self.cue_stimuli = CueStimulusArray(self.win, self.eccentricity_stimuli, self.size_stimuli)
-
-        self.correct_stimulus = visual.TextStim(self.win, text='v', color='green', height=self.settings['experiment']['size_fixation'])
-        self.error_stimulus = visual.TextStim(self.win, text='x', color='red', height=self.settings['experiment']['size_fixation']*2.)
+        self.correct_stimulus = visual.TextStim(
+            self.win,
+            text="v",
+            color="green",
+            height=self.settings["experiment"]["size_fixation"],
+        )
+        self.error_stimulus = visual.TextStim(
+            self.win,
+            text="x",
+            color="red",
+            height=self.settings["experiment"]["size_fixation"] * 2.0,
+        )
 
         self.rt_clock = core.Clock()
 
@@ -62,10 +121,9 @@ class SingletonSession(PylinkEyetrackerSession):
         core.wait(0.02)
         self.beep.stop()
         self.beep_count = 0
-        
-        
+
     def run(self):
-        """ Runs experiment. """
+        """Runs experiment."""
         if self.eyetracker_on and self.show_eyetracker_calibration:
             self.calibrate_eyetracker()
 
@@ -76,9 +134,8 @@ class SingletonSession(PylinkEyetrackerSession):
 
         for trial in self.trials:
             trial.run()
-        
-        # self.close()
 
+        # self.close()
 
     def create_trials(self, most_likely_distractor_location, include_instructions=True):
         """Create trials."""
@@ -94,33 +151,47 @@ class SingletonSession(PylinkEyetrackerSession):
         if include_instructions:
             if most_likely_distractor_location == 10:
                 instruction_entries = [
-                    self.instructions['intro'],
-                    self.instructions['example1'],
-                    self.instructions['example2'],
-                    self.instructions['example3'],
-                    self.instructions['fix'],
-                    self.instructions['summary'],
-                    self.instructions['reminder']
+                    self.instructions["intro"],
+                    self.instructions["example1"],
+                    self.instructions["example2"],
+                    self.instructions["example3"],
+                    self.instructions["fix"],
+                    self.instructions["summary"],
+                    self.instructions["reminder"],
                 ]
 
                 instruction_trials = []
                 for i, entry in enumerate(instruction_entries):
                     # Handle either plain string or dict with 'text' and optional 'image'
                     if isinstance(entry, dict):
-                        text = entry['text'].format(run=self.settings['run'])
-                        image_path = resolve_image_path(entry.get('image', None))
+                        text = entry["text"].format(run=self.settings["run"])
+                        image_path = resolve_image_path(entry.get("image", None))
                     else:
-                        text = entry.format(run=self.settings['run'])
+                        text = entry.format(run=self.settings["run"])
                         image_path = None
 
-                    if entry == self.instructions['example1']:
+                    if entry == self.instructions["example1"]:
                         instruction_trials.append(
-                            InstructionTrial(self, i, txt=text, image_path=image_path, bottom_txt="Press j to continue", keys=['j'])
+                            InstructionTrial(
+                                self,
+                                i,
+                                txt=text,
+                                image_path=image_path,
+                                bottom_txt="Press j to continue",
+                                keys=["j"],
+                            )
                         )
-                    elif entry == self.instructions['example2']:
+                    elif entry == self.instructions["example2"]:
                         instruction_trials.append(
-                            InstructionTrial(self, i, txt=text, image_path=image_path, bottom_txt="Press f to continue", keys=['f'])
-                        )                    
+                            InstructionTrial(
+                                self,
+                                i,
+                                txt=text,
+                                image_path=image_path,
+                                bottom_txt="Press f to continue",
+                                keys=["f"],
+                            )
+                        )
                     else:
                         instruction_trials.append(
                             InstructionTrial(self, i, txt=text, image_path=image_path)
@@ -129,17 +200,17 @@ class SingletonSession(PylinkEyetrackerSession):
                 self.trials = instruction_trials
             else:
                 instruction_entries = [
-                    self.instructions['return'],
+                    self.instructions["return"],
                 ]
 
                 instruction_trials = []
                 for i, entry in enumerate(instruction_entries):
                     # Handle either plain string or dict with 'text' and optional 'image'
                     if isinstance(entry, dict):
-                        text = entry['text'].format(run=self.settings['run'])
-                        image_path = resolve_image_path(entry.get('image', None))
+                        text = entry["text"].format(run=self.settings["run"])
+                        image_path = resolve_image_path(entry.get("image", None))
                     else:
-                        text = entry.format(run=self.settings['run'])
+                        text = entry.format(run=self.settings["run"])
                         image_path = None
 
                     instruction_trials.append(
@@ -150,18 +221,28 @@ class SingletonSession(PylinkEyetrackerSession):
         else:
             self.trials = []
 
-        possible_itis = self.settings['durations']['iti']
-        n_trials = self.settings['design']['n_trials']
+        possible_itis = self.settings["durations"]["iti"]
+        n_trials = self.settings["design"]["n_trials"]
 
         indices = [1, 3, 5, 7, 10]
 
-        #for the dot version
-        if most_likely_distractor_location<10:
+        # for the dot version
+        if most_likely_distractor_location < 10:
             indices.remove(most_likely_distractor_location)
-            indices.insert(0,most_likely_distractor_location)
-            t_d_locs = [(t,d) for t in [0,0,0,0,1,2,3] for d in [0,0,0,0,0,0,0,0,0,0,1,2,3] if t != d] + [(t,d) for t in [0,1,2,3] for d in [4]] * 3
+            indices.insert(0, most_likely_distractor_location)
+            t_d_locs = [
+                (t, d)
+                for t in [0, 0, 0, 0, 1, 2, 3]
+                for d in [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3]
+                if t != d
+            ] + [(t, d) for t in [0, 1, 2, 3] for d in [4]] * 3
         else:
-            t_d_locs = [(t,d) for t in [0,1,2,3] for d in [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3] if t != d] + [(t,d) for t in [0,1,2,3] for d in [4]] * 3
+            t_d_locs = [
+                (t, d)
+                for t in [0, 1, 2, 3]
+                for d in [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
+                if t != d
+            ] + [(t, d) for t in [0, 1, 2, 3] for d in [4]] * 3
 
         # #for present/absent version
         # t_present_d_present = [(t,d) for t in [0,1,2,3] for d in [0,0,0,0,0,0,0,1,2,3] if t != d]
@@ -173,31 +254,90 @@ class SingletonSession(PylinkEyetrackerSession):
         np.random.shuffle(t_d_locs)
 
         # Assert n_trials is multiple of possible_itis
-        assert n_trials % len(possible_itis) == 0, 'n_trials should be multiple of possible itis'
-        assert n_trials % len(t_d_locs) == 0, 'n_trials should be multiple of possible tar/dist combinations'
+        assert (
+            n_trials % len(possible_itis) == 0
+        ), "n_trials should be multiple of possible itis"
+        assert (
+            n_trials % len(t_d_locs) == 0
+        ), "n_trials should be multiple of possible tar/dist combinations"
 
         itis = np.tile(possible_itis, n_trials // len(possible_itis))
         np.random.shuffle(itis)
 
-        self.trials.append(BlankTrial(self, 0))
+        print("???", self.settings["durations"].get("blank", 1))
+        dummy_trial = DummyWaiterTrial(
+            session=self,
+            trial_nr=0,
+            phase_durations=[np.inf, self.settings["durations"].get("blank", 1)],
+            phase_names=["start_exp", "intro_dummy_scan"],
+            draw_each_frame=False,
+        )
+
+        start_trial = WaitStartTriggerTrial(
+            session=self,
+            trial_nr=1,
+            phase_durations=[np.inf],
+            draw_each_frame=False,
+        )
+        self.trials.append(dummy_trial)
+        self.trials.append(start_trial)
 
         # If practice, use different trial function which includes eye deviation beeps
-        if self.settings['session'] == 1:
+        if self.settings["session"] == 1:
             for ix, iti in enumerate(itis):
-                self.trials.append(SingletonTrial_training(self, ix+1, iti=iti, distractor_location=indices[t_d_locs[ix][1]], target_location=indices[t_d_locs[ix][0]],most_likely_distractor_location=most_likely_distractor_location))
+                self.trials.append(
+                    SingletonTrial_training(
+                        self,
+                        ix + 1,
+                        iti=iti,
+                        distractor_location=indices[t_d_locs[ix][1]],
+                        target_location=indices[t_d_locs[ix][0]],
+                        most_likely_distractor_location=most_likely_distractor_location,
+                    )
+                )
         else:
             for ix, iti in enumerate(itis):
-                self.trials.append(SingletonTrial(self, ix+1, iti=iti, distractor_location=indices[t_d_locs[ix][1]], target_location=indices[t_d_locs[ix][0]],most_likely_distractor_location=most_likely_distractor_location))
-        
-        self.trials.append(BlankTrial(self, ix+2))
+                self.trials.append(
+                    SingletonTrial(
+                        self,
+                        ix + 1,
+                        iti=iti,
+                        distractor_location=indices[t_d_locs[ix][1]],
+                        target_location=indices[t_d_locs[ix][0]],
+                        most_likely_distractor_location=most_likely_distractor_location,
+                    )
+                )
 
-        #show either a break screen or the end of experiment screen. Assumes 6 runs per session
-        if (self.settings['run']==6) or (self.settings['run']==12):
-            entry = self.instructions['fix']
-            text = entry.format(run=self.settings['run'])
-            self.trials.append(InstructionTrial(self, self.instructions['fix'], txt=text, image_path=None))
-        
+        # self.trials.append(BlankTrial(self, ix + 2))
+
+        # show either a break screen or the end of experiment screen. Assumes 6 runs per session
+        if (self.settings["run"] == 6) or (self.settings["run"] == 12):
+            entry = self.instructions["fix"]
+            text = entry.format(run=self.settings["run"])
+            self.trials.append(
+                InstructionTrial(
+                    self, self.instructions["fix"], txt=text, image_path=None
+                )
+            )
+
         else:
-            entry = self.instructions['break']
-            text = entry.format(run=self.settings['run'])
-            self.trials.append(InstructionTrial(self, self.instructions['break'], txt=text, image_path=None))
+            entry = self.instructions["break"]
+            text = entry.format(run=self.settings["run"])
+            self.trials.append(
+                InstructionTrial(
+                    self, self.instructions["break"], txt=text, image_path=None
+                )
+            )
+
+        self.trials.append(
+            OutroTrial(
+                session=self,
+                trial_nr=ix + 3,
+                phase_durations=[
+                    self.settings["durations"].get("blank", 1),
+                    0.10,
+                ],
+                phase_names=["outro_dummy_scan", "end_exp"],
+                draw_each_frame=False,
+            )
+        )
