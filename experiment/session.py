@@ -192,10 +192,10 @@ class SingletonSession(PylinkEyetrackerSession):
         self.trials.append(BlankTrial(self, ix+2))
 
         #show either a break screen or the end of experiment screen. Assumes 6 runs per session
-        if (run==6) or (run==12):
-            entry = self.instructions['fin']
+        if (self.settings['run']==6) or (self.settings['run']==12):
+            entry = self.instructions['fix']
             text = entry.format(run=self.settings['run'])
-            self.trials.append(InstructionTrial(self, self.instructions['fin'], txt=text, image_path=None))
+            self.trials.append(InstructionTrial(self, self.instructions['fix'], txt=text, image_path=None))
         
         else:
             entry = self.instructions['break']
