@@ -38,7 +38,7 @@ durations:
   feedback: 1
   iti: [1, 3, 5]
   #  iti: [0.5]
-  blank: 20
+  blank: 19.9
 
 various:
   text_width: 15
