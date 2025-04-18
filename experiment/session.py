@@ -312,7 +312,7 @@ class SingletonSession(PylinkEyetrackerSession):
         self.trials.append(
             OutroTrial(
                 session=self,
-                trial_nr=ix + 3,
+                trial_nr=ix + 1,
                 phase_durations=[
                     self.settings["durations"].get("blank", 1),
                     0.10,
@@ -340,5 +340,3 @@ class SingletonSession(PylinkEyetrackerSession):
                     self, self.instructions["break"], txt=text, image_path=None
                 )
             )
-
-        
