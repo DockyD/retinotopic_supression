@@ -128,7 +128,7 @@ break: |
 
 
 return: 
-  text: 
+  text: |
     - WELCOME BACK! -
 
     Weclome to the MRI sessions of this experiment!
