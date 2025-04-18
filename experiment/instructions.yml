@@ -91,8 +91,6 @@ summary: |
   the screen. This is unrelated to your
   task and can be ignored.
 
-  Press space bar to start the real trials.
-
 reminder: |
 
   - REMINDER -
@@ -108,7 +106,7 @@ reminder: |
 
   Now if you are ready, lets start the trials!
 
-  Press space bar to start the real trials.
+  -- WARNING if you press a button now you will start the real experiment trials --
 
 break: |
   - TIME FOR A BREAK! -
@@ -117,18 +115,30 @@ break: |
 
   Take a moment to rest your eyes.
 
-  Press space bar to start the next block of trials.
+break: |
+  - YOURE FINISHED -
 
-return: |
-  - WELCOME BACK! -
+  You have just completed the whole experimental session! Great job!
 
-  Weclome to the MRI sessions of this experiment!
-  The fact that you are here means that you were very 
-  good at keeping your eyes still. So you should
-  be proud of that!!
+  If this was training, then the experimenter will now let you know
+  if your eye control was good enough to proceed with the scanning sessions.
 
-  We will now do eight blocks of the exact same
-  task you did in the eyetracker labs, but now you
-  are laying in a big magnet.
+  If this was a scanning session then you will now be ejected from the 
+  expensive magnetic tube
 
-  Press any button to jump back into the task!
+
+return: 
+  text: 
+    - WELCOME BACK! -
+
+    Weclome to the MRI sessions of this experiment!
+    The fact that you are here means that you were very 
+    good at keeping your eyes still. So you should
+    be proud of that!!
+
+    We will now do six blocks of the exact same
+    task you did in the eyetracker labs, but now you
+    are laying in a big magnet.
+
+    Press any button to jump back into the task!
+  image: images/withBar.png

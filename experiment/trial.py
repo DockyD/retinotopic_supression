@@ -218,7 +218,7 @@ class SingletonTrial_training(SingletonTrial):
     def draw(self):
 
         if self.phase == 0:
-            self.session.fixation_dot.color = 'blue'
+            self.session.fixation_dot.color = 'white'
         elif self.phase == 1:
             self.session.fixation_dot.color = 'white'
 

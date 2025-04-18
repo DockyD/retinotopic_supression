@@ -14,7 +14,7 @@ def main(subject, session, run, settings='default', use_eyetracker=True):
     """
     start the experiment by providing three variables:
     subject number (between 1 and infinity)
-    session number (0 = practive, 1 = scanning, 2 = scanning)
+    session number (1 = practice, 2 = scanning, 3 = scanning)
 
     thats all folks!
     we will automatically find what HP condition to use
@@ -25,10 +25,10 @@ def main(subject, session, run, settings='default', use_eyetracker=True):
     """
     calibrate_eyetracker=True
 
-    # hp_list = [10,10,10,10]
-    hp_list = [3,7] ## for our pilot experiments
+    hp_list = [10,10,10,10]
+    # hp_list = [3,7] ## for our pilot experiments
 
-    if session > 0:
+    if session > 1:
         hp_list = ([1,5,3,7],
                      [1,5,7,3],
                      [5,1,3,7],
@@ -37,12 +37,13 @@ def main(subject, session, run, settings='default', use_eyetracker=True):
                      [7,3,1,5],
                      [3,7,5,1],
                      [7,3,5,1])[subject%8-1]
-
+    
     most_likely_distractor_location = hp_list[run//3-1]
-    output_dir, output_str = get_output_dir_str(subject, session, 'estimation_task', run)
+    output_dir, output_str = get_output_dir_str(subject, session, 'ret_sup', run)
     settings_fn, use_eyetracker = get_settings(settings)
     include_instructions = False
-    # if (session == 0) & (run ==1):
+    print(most_likely_distractor_location)
+    # if (session == 1) & (run ==1):
     #     include_instructions = True
     if (run ==1):
         include_instructions = True

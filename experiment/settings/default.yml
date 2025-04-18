@@ -37,6 +37,7 @@ durations:
    target: 1.5
    feedback: 1
    iti: [1, 3, 5]
+  #  iti: [0.5]
    blank: 20
 
 various:

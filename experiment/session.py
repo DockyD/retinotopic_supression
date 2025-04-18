@@ -92,7 +92,7 @@ class SingletonSession(PylinkEyetrackerSession):
             return abs_path if op.exists(abs_path) else None
 
         if include_instructions:
-            if most_likely_distractor_location < 9:
+            if most_likely_distractor_location == 10:
                 instruction_entries = [
                     self.instructions['intro'],
                     self.instructions['example1'],
@@ -113,9 +113,18 @@ class SingletonSession(PylinkEyetrackerSession):
                         text = entry.format(run=self.settings['run'])
                         image_path = None
 
-                    instruction_trials.append(
-                        InstructionTrial(self, i, txt=text, image_path=image_path)
-                    )
+                    if entry == self.instructions['example1']:
+                        instruction_trials.append(
+                            InstructionTrial(self, i, txt=text, image_path=image_path, bottom_txt="Press j to continue", keys=['j'])
+                        )
+                    elif entry == self.instructions['example2']:
+                        instruction_trials.append(
+                            InstructionTrial(self, i, txt=text, image_path=image_path, bottom_txt="Press f to continue", keys=['f'])
+                        )                    
+                    else:
+                        instruction_trials.append(
+                            InstructionTrial(self, i, txt=text, image_path=image_path)
+                        )
 
                 self.trials = instruction_trials
             else:
@@ -172,8 +181,8 @@ class SingletonSession(PylinkEyetrackerSession):
 
         self.trials.append(BlankTrial(self, 0))
 
-        # embed()
-        if str(self.settings['session']) == 0:
+        # If practice, use different trial function which includes eye deviation beeps
+        if self.settings['session'] == 1:
             for ix, iti in enumerate(itis):
                 self.trials.append(SingletonTrial_training(self, ix+1, iti=iti, distractor_location=indices[t_d_locs[ix][1]], target_location=indices[t_d_locs[ix][0]],most_likely_distractor_location=most_likely_distractor_location))
         else:
@@ -182,6 +191,13 @@ class SingletonSession(PylinkEyetrackerSession):
         
         self.trials.append(BlankTrial(self, ix+2))
 
-        entry = self.instructions['break']
-        text = entry.format(run=self.settings['run'])
-        self.trials.append(InstructionTrial(self, self.instructions['break'], txt=text, image_path=None))
+        #show either a break screen or the end of experiment screen. Assumes 6 runs per session
+        if (run==6) or (run==12):
+            entry = self.instructions['fin']
+            text = entry.format(run=self.settings['run'])
+            self.trials.append(InstructionTrial(self, self.instructions['fin'], txt=text, image_path=None))
+        
+        else:
+            entry = self.instructions['break']
+            text = entry.format(run=self.settings['run'])
+            self.trials.append(InstructionTrial(self, self.instructions['break'], txt=text, image_path=None))
