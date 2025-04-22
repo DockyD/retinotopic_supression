@@ -10,6 +10,7 @@ from utils import get_output_dir_str, get_settings
 from session import SingletonSession
 import argparse
 
+
 def main(subject, session, run, settings='default', use_eyetracker=True):
     """
     start the experiment by providing three variables:
@@ -23,37 +24,42 @@ def main(subject, session, run, settings='default', use_eyetracker=True):
     as well as whether to use eyetracker. 
     Automatically calibrates every block if used.
     """
-    calibrate_eyetracker=True
+    eyetracker_on = use_eyetracker
+    calibrate_eyetracker = True
 
-    hp_list = [10,10,10,10]
+    hp_list = [10, 10, 10, 10]
     # hp_list = [3,7] ## for our pilot experiments
 
     if session > 1:
-        hp_list = ([1,5,3,7],
-                     [1,5,7,3],
-                     [5,1,3,7],
-                     [5,1,7,3],
-                     [3,7,1,5],
-                     [7,3,1,5],
-                     [3,7,5,1],
-                     [7,3,5,1])[subject%8-1]
-    
+        hp_list = ([1, 5, 3, 7],
+                   [1, 5, 7, 3],
+                   [5, 1, 3, 7],
+                   [5, 1, 7, 3],
+                   [3, 7, 1, 5],
+                   [7, 3, 1, 5],
+                   [3, 7, 5, 1],
+                   [7, 3, 5, 1])[subject % 8-1]
+        eyetracker_on = False,
+        calibrate_eyetracker = False
+
     most_likely_distractor_location = hp_list[run//3-1]
-    output_dir, output_str = get_output_dir_str(subject, session, 'ret_sup', run)
+    output_dir, output_str = get_output_dir_str(
+        subject, session, 'ret_sup', run)
     settings_fn, use_eyetracker = get_settings(settings)
     include_instructions = False
     print(most_likely_distractor_location)
     # if (session == 1) & (run ==1):
     #     include_instructions = True
-    if (run ==1):
+    if (run == 1):
         include_instructions = True
 
     run_session = SingletonSession(output_str=output_str, subject=subject, session=session,
-                        output_dir=output_dir, settings_file=settings_fn, 
-                        run=run, eyetracker_on=True,
-                        calibrate_eyetracker=calibrate_eyetracker)
+                                   output_dir=output_dir, settings_file=settings_fn,
+                                   run=run, eyetracker_on=eyetracker_on,
+                                   calibrate_eyetracker=calibrate_eyetracker)
 
-    run_session.create_trials(most_likely_distractor_location=most_likely_distractor_location, include_instructions=include_instructions)
+    run_session.create_trials(
+        most_likely_distractor_location=most_likely_distractor_location, include_instructions=include_instructions)
     run_session.run()
     print(f"Eyemovements: {run_session.beep_count} trials")
 
@@ -70,14 +76,18 @@ def main(subject, session, run, settings='default', use_eyetracker=True):
 
 #     main(args.subject, args.session, args.run, args.settings, calibrate_eyetracker=True, most_likely_distractor_location=args.most_likely_distractor_location)
 
+
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
     argparser.add_argument('subject', type=int, help='Subject nr')
     argparser.add_argument('session', type=int, help='Session')
     argparser.add_argument('run', type=int, help='run')
-    argparser.add_argument('--settings', type=str, help='Settings label', default='default')
-    argparser.add_argument('--use_eyetracker', action='store_true', help='Enable eyetracker')
+    argparser.add_argument('--settings', type=str,
+                           help='Settings label', default='default')
+    argparser.add_argument(
+        '--use_eyetracker', action='store_true', help='Enable eyetracker')
 
     args = argparser.parse_args()
 
-    main(args.subject, args.session, args.run, args.settings, args.use_eyetracker)
+    main(args.subject, args.session, args.run,
+         args.settings, args.use_eyetracker)

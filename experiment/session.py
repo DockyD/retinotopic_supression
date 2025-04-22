@@ -1,18 +1,7 @@
-import psychopy
-
-psychopy.prefs.hardware["audioLib"] = ["ptb", "pyo", "pygame"]
-from exptools2.core import Session, PylinkEyetrackerSession
-from stimuli import (
-    CueStimulusArray,
-    SweepingBarStimulus,
-    FixationStimulus,
-    TargetStimulusArray,
-    BackgroundCircle,
-)
-import numpy as np
-import os.path as op
-import yaml
-from pathlib import Path
+from psychopy.sound import Sound
+from psychopy import sound
+from IPython import embed
+from psychopy import visual, core
 from trial import (
     InstructionTrial,
     SingletonTrial,
@@ -22,10 +11,21 @@ from trial import (
     WaitStartTriggerTrial,
     OutroTrial,
 )
-from psychopy import visual, core
-from IPython import embed
-from psychopy import sound
-from psychopy.sound import Sound
+from pathlib import Path
+import yaml
+import os.path as op
+import numpy as np
+from stimuli import (
+    CueStimulusArray,
+    SweepingBarStimulus,
+    FixationStimulus,
+    TargetStimulusArray,
+    BackgroundCircle,
+)
+from exptools2.core import Session, PylinkEyetrackerSession
+import psychopy
+
+psychopy.prefs.hardware["audioLib"] = ["ptb", "pyo", "pygame"]
 
 
 class SingletonSession(PylinkEyetrackerSession):
@@ -51,6 +51,7 @@ class SingletonSession(PylinkEyetrackerSession):
         )
         self.mri_trigger = "t"
         self.show_eyetracker_calibration = calibrate_eyetracker
+        self.stimulus_shift = self.settings["experiment"]["stimulus_shift"]
 
         self.instructions = yaml.safe_load(
             (Path(__file__).parent / "instructions.yml").read_text()
@@ -69,7 +70,8 @@ class SingletonSession(PylinkEyetrackerSession):
         self.radius_bar_aperture = self.eccentricity_stimuli - self.size_stimuli / 1.8
 
         self.fixation_dot = FixationStimulus(
-            self.win, size=self.settings["experiment"]["size_fixation"]
+            self.win, size=self.settings["experiment"]["size_fixation"], position=(
+                0, self.stimulus_shift)
         )
         self.sweeping_bars = SweepingBarStimulus(
             self.win,
@@ -89,6 +91,7 @@ class SingletonSession(PylinkEyetrackerSession):
             self.win,
             eccentricity=self.eccentricity_stimuli,
             stimulus_size=self.size_stimuli,
+            stimulus_shift=self.stimulus_shift,
         )
         self.cue_stimuli = CueStimulusArray(
             self.win, self.eccentricity_stimuli, self.size_stimuli
@@ -99,12 +102,14 @@ class SingletonSession(PylinkEyetrackerSession):
             text="v",
             color="green",
             height=self.settings["experiment"]["size_fixation"],
+            pos=(0, self.stimulus_shift),
         )
         self.error_stimulus = visual.TextStim(
             self.win,
             text="x",
             color="red",
             height=self.settings["experiment"]["size_fixation"] * 2.0,
+            pos=(0, self.stimulus_shift),
         )
 
         self.rt_clock = core.Clock()
@@ -165,7 +170,8 @@ class SingletonSession(PylinkEyetrackerSession):
                     # Handle either plain string or dict with 'text' and optional 'image'
                     if isinstance(entry, dict):
                         text = entry["text"].format(run=self.settings["run"])
-                        image_path = resolve_image_path(entry.get("image", None))
+                        image_path = resolve_image_path(
+                            entry.get("image", None))
                     else:
                         text = entry.format(run=self.settings["run"])
                         image_path = None
@@ -194,7 +200,8 @@ class SingletonSession(PylinkEyetrackerSession):
                         )
                     else:
                         instruction_trials.append(
-                            InstructionTrial(self, i, txt=text, image_path=image_path)
+                            InstructionTrial(
+                                self, i, txt=text, image_path=image_path)
                         )
 
                 self.trials = instruction_trials
@@ -208,13 +215,15 @@ class SingletonSession(PylinkEyetrackerSession):
                     # Handle either plain string or dict with 'text' and optional 'image'
                     if isinstance(entry, dict):
                         text = entry["text"].format(run=self.settings["run"])
-                        image_path = resolve_image_path(entry.get("image", None))
+                        image_path = resolve_image_path(
+                            entry.get("image", None))
                     else:
                         text = entry.format(run=self.settings["run"])
                         image_path = None
 
                     instruction_trials.append(
-                        InstructionTrial(self, i, txt=text, image_path=image_path)
+                        InstructionTrial(self, i, txt=text,
+                                         image_path=image_path)
                     )
 
                 self.trials = instruction_trials
@@ -268,7 +277,8 @@ class SingletonSession(PylinkEyetrackerSession):
         dummy_trial = DummyWaiterTrial(
             session=self,
             trial_nr=0,
-            phase_durations=[np.inf, self.settings["durations"].get("blank", 1)],
+            phase_durations=[
+                np.inf, self.settings["durations"].get("blank", 1)],
             phase_names=["start_exp", "intro_dummy_scan"],
             draw_each_frame=False,
         )

@@ -45,7 +45,7 @@ class InstructionTrial(Trial):
             self.text = TextStim(
                 session.win,
                 txt,
-                pos=(-6.0, 0.0),
+                pos=(-4.0, 0.0),
                 height=txt_height,
                 wrapWidth=txt_width,
                 color=txt_color,
@@ -122,7 +122,8 @@ class SingletonTrial(Trial):
         **kwargs,
     ):
 
-        trial_start_duration = session.settings["durations"].get("trial_start", 1)
+        trial_start_duration = session.settings["durations"].get(
+            "trial_start", 1)
         cue_duration = session.settings["durations"].get("cue", 1)
         target_duration = session.settings["durations"].get("target", 1)
         feedback_duration = session.settings["durations"].get("feedback", 1)
@@ -134,7 +135,8 @@ class SingletonTrial(Trial):
             feedback_duration,
             iti,
         ]
-        phase_names = ["trial_start", "pre-target", "target", "feedback", "iti"]
+        phase_names = ["trial_start", "pre-target",
+                       "target", "feedback", "iti"]
 
         super().__init__(
             session,
@@ -430,7 +432,7 @@ class DummyWaiterTrial(Trial):
                         print("Got trigger in phase 0")
                         self.stop_phase()
                         #####################################################
-                        ## TRIGGER HERE
+                        # TRIGGER HERE
                         #####################################################
                         self.session.experiment_start_time = getTime()
 

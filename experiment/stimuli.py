@@ -1,5 +1,8 @@
+from psychopy import visual, core, event
+from psychopy import plugins
 from psychopy import visual
 import numpy as np
+
 
 class TargetStimulus(object):
 
@@ -91,20 +94,21 @@ class TargetStimulus(object):
         self.rectangle.height = value / 4
         self.dot.radius = value / 15  # Scale dot size with the rectangle
 
+
 class TargetStimulusArray(object):
 
     n_objects = 8
 
-    def __init__(self, win, eccentricity=9, stimulus_size=1):
+    def __init__(self, win, eccentricity=9, stimulus_size=1, stimulus_shift=0):
         self.win = win
         self.eccentricity = eccentricity
         self.stimulus_size = stimulus_size
         self.stimuli = []
-        self.positions = self.get_positions(eccentricity)
+        self.positions = self.get_positions(eccentricity, stimulus_shift)
 
         # Initialize stimuli with default settings
         for ix in range(self.n_objects):
-            self.stimuli.append(TargetStimulus(win, target=False, pos=self.positions[ix], 
+            self.stimuli.append(TargetStimulus(win, target=False, pos=self.positions[ix],
                                                size=stimulus_size, color='green', ori=np.pi/2.))
 
     def setup(self, distractor_color, target_orientation, distractor_location, target_location,
@@ -123,8 +127,10 @@ class TargetStimulusArray(object):
         # assert 0 <= distractor_location < self.n_objects
         # assert 0 <= target_location < self.n_objects
 
-        other_color = (0.78,0.14,-1) if distractor_color == 'green' else (-1, 0.33, -1)
-        distractor_color = (0.78,0.14,-1)  if distractor_color == 'red' else (-1, 0.33, -1)
+        other_color = (
+            0.78, 0.14, -1) if distractor_color == 'green' else (-1, 0.33, -1)
+        distractor_color = (
+            0.78, 0.14, -1) if distractor_color == 'red' else (-1, 0.33, -1)
         other_orientation = 90. if target_orientation == 0.0 else 0.0
 
         print(f'Setting up trial: distractor={distractor_location},\ntarget={target_location},\ndistractor_color={distractor_color},\ntarget_orientation={target_orientation}\n other_color={other_color},\nother_orientation={other_orientation}')
@@ -132,19 +138,22 @@ class TargetStimulusArray(object):
 
         for ix, stimulus in enumerate(self.stimuli):
             if ix == distractor_location:
-                stimulus.update(target=dot_presence[ix], color=distractor_color, ori=other_orientation)
+                stimulus.update(
+                    target=dot_presence[ix], color=distractor_color, ori=other_orientation)
             elif ix == target_location:
-                stimulus.update(target=dot_presence[ix], color=other_color, ori=target_orientation)
+                stimulus.update(
+                    target=dot_presence[ix], color=other_color, ori=target_orientation)
             else:
-                stimulus.update(target=dot_presence[ix], color=other_color, ori=other_orientation)
+                stimulus.update(
+                    target=dot_presence[ix], color=other_color, ori=other_orientation)
 
-    def get_positions(self, eccentricity):
+    def get_positions(self, eccentricity, stimulus_shift):
         """Returns evenly spaced positions in a circular layout."""
         positions = []
         for i in range(self.n_objects):
             angle = i * 360 / self.n_objects
             x = eccentricity * np.cos(np.radians(angle))
-            y = eccentricity * np.sin(np.radians(angle))
+            y = eccentricity * np.sin(np.radians(angle)) + stimulus_shift
             positions.append((x, y))
         return positions
 
@@ -153,7 +162,6 @@ class TargetStimulusArray(object):
         for stimulus in self.stimuli:
             stimulus.draw()
 
-from psychopy import visual
 
 class FixationStimulus:
     def __init__(self, win, position=(0, 0), size=0.5, color='grey', cross_color='black', cross_thickness=2):
@@ -186,12 +194,12 @@ class FixationStimulus:
         # Cross lines for better visibility
         cross_length = self.size  # Length of the cross arms
         self.h_line = visual.Line(
-            win=win, start=(position[0] - cross_length / 2, position[1]), 
+            win=win, start=(position[0] - cross_length / 2, position[1]),
             end=(position[0] + cross_length / 2, position[1]),
             lineColor=cross_color, lineWidth=cross_thickness
         )
         self.v_line = visual.Line(
-            win=win, start=(position[0], position[1] - cross_length / 2), 
+            win=win, start=(position[0], position[1] - cross_length / 2),
             end=(position[0], position[1] + cross_length / 2),
             lineColor=cross_color, lineWidth=cross_thickness
         )
@@ -203,7 +211,7 @@ class FixationStimulus:
         :param cross: Whether to draw the cross lines (default: True)
         """
         self.dot.draw()
-        
+
         if cross:
             self.h_line.draw()
             self.v_line.draw()
@@ -219,13 +227,9 @@ class FixationStimulus:
         self._color = value
         self.dot.color = value  # Update visual property
 
-from psychopy import visual, core, event
-import numpy as np
-from psychopy import plugins
+
 plugins.loadPlugin('psychopy_visionscience')
 
-
-from psychopy import visual, core, event
 
 class SweepingBarStimulus:
     def __init__(self, win, session, fov_size=20, bar_width=2, speed=2, rest_duration=2, break_duration=10):
@@ -253,42 +257,47 @@ class SweepingBarStimulus:
         self.contrast = 1.0
 
         # ✅ Define paradigm: movement directions + rest periods
-        self.directions = ["rest", "right", "rest", "left", "rest", "down", "rest", "up", "break"]
+        self.directions = ["rest", "right", "rest",
+                           "left", "rest", "down", "rest", "up", "break"]
         self.current_direction_index = 0  # Start with the first direction
-        self.sweep_clock = core.Clock()  # Keeps track of how long we've been in the current sweep
+        # Keeps track of how long we've been in the current sweep
+        self.sweep_clock = core.Clock()
 
         # ✅ Compute how long a full sweep takes
-        self.sweep_duration = (fov_size + self.bar_width*2) / speed  # Ensure full traversal of FOV
+        # Ensure full traversal of FOV
+        self.sweep_duration = (fov_size + self.bar_width*2) / speed
 
         # ✅ Create the **rectangular bar** with a checkerboard pattern
         self.bar = visual.GratingStim(
             win, tex="sqrXsqr", mask=None,
             size=(bar_width, fov_size), sf=self.bar_width * 1.5, contrast=self.contrast,
-            interpolate=False, units="deg", ori=0  # Default orientation
+            # Default orientation
+            interpolate=False, units="deg", ori=0, pos=(0, self.session.stimulus_shift)
         )
 
         # ✅ Create a **circular aperture**
-        self.aperture = visual.Aperture(win, size=fov_size)
+        self.aperture = visual.Aperture(
+            win, size=fov_size, pos=(0, self.session.stimulus_shift))
         self.aperture.enabled = False  # Ensures it applies only when needed
 
         self.background_circle = visual.Circle(
-            win, radius=fov_size / 2.0, fillColor=None, lineColor='darkgray', lineWidth=5.0, pos=(0, 0)
+            win, radius=fov_size / 2.0, fillColor=None, lineColor='darkgray', lineWidth=5.0, pos=(0, self.session.stimulus_shift)
         )
-
 
     def switch_direction(self):
         """ Switches to the next movement direction in the paradigm. """
 
-        self.current_direction_index = (self.current_direction_index + 1) % len(self.directions)
+        self.current_direction_index = (
+            self.current_direction_index + 1) % len(self.directions)
         self.sweep_clock.reset()  # Reset the clock for the new sweep
 
         onset = self.session.clock.getTime()
         idx = self.session.global_log.shape[0]
         self.session.global_log.loc[idx, 'onset'] = onset
-        self.session.global_log.loc[idx, 'event_type'] = f'bar_{self.directions[self.current_direction_index]}'
+        self.session.global_log.loc[idx,
+                                    'event_type'] = f'bar_{self.directions[self.current_direction_index]}'
         self.session.global_log.loc[idx, 'nr_frames'] = 0
         # print(self.session.global_log)
-
 
     def update_position(self):
         """ Moves the bar across the screen OR enters a rest period. """
@@ -304,16 +313,20 @@ class SweepingBarStimulus:
             t = self.sweep_clock.getTime() * self.speed
 
             if direction == "right":
-                self.bar.pos = (-self.fov_size / 2 - self.bar_width / 2 + t, 0)
+                self.bar.pos = (-self.fov_size / 2 -
+                                self.bar_width / 2 + t, self.session.stimulus_shift)
                 self.bar.ori = 0  # ✅ Keep bar horizontal
             elif direction == "left":
-                self.bar.pos = (self.fov_size / 2 + self.bar_width / 2 - t, 0)
+                self.bar.pos = (self.fov_size / 2 + self.bar_width /
+                                2 - t, self.session.stimulus_shift)
                 self.bar.ori = 0  # ✅ Keep bar horizontal
             elif direction == "down":
-                self.bar.pos = (0, self.fov_size / 2  + self.bar_width / 2 - t)
+                self.bar.pos = (
+                    0, self.fov_size / 2 + self.bar_width / 2 - t + self.session.stimulus_shift)
                 self.bar.ori = 90  # ✅ Rotate bar 90° for vertical movement
             elif direction == "up":
-                self.bar.pos = (0, -self.fov_size / 2 - self.bar_width / 2 + t)
+                self.bar.pos = (
+                    0, -self.fov_size / 2 - self.bar_width / 2 + t + self.session.stimulus_shift)
                 self.bar.ori = 90  # ✅ Rotate bar 90° for vertical movement
 
         # ✅ Check if it's time to switch direction
@@ -336,7 +349,8 @@ class SweepingBarStimulus:
 
         self.aperture.enabled = True  # ✅ Enable aperture just for this stimulus
         self.bar.draw()
-        self.aperture.enabled = False  # ✅ Disable aperture so it doesn’t affect other stimuli
+        # ✅ Disable aperture so it doesn’t affect other stimuli
+        self.aperture.enabled = False
 
         self.background_circle.draw()
 
@@ -347,15 +361,15 @@ class BackgroundCircle:
         self.session = session
         self.fov_size = fov_size
         self.background_circle = visual.Circle(
-            win, radius=fov_size / 2.0, fillColor=None, lineColor='darkgray', lineWidth=5.0, pos=(0, 0)
+            win, radius=fov_size / 2.0, fillColor=None, lineColor='darkgray', lineWidth=5.0, pos=(0, self.session.stimulus_shift)
         )
-        
+
     def draw(self):
         self.background_circle.draw()
 
 
 class CueStimulusArray:
-    
+
     n_objects = 8  # Default number of stimuli
 
     def __init__(self, win, eccentricity=9, size=1.0, stim_type="circle"):
@@ -368,7 +382,8 @@ class CueStimulusArray:
         :param size: Size of each stimulus (in degrees)
         :param stim_type: "circle" or "square" (rotated by 90 degrees)
         """
-        assert stim_type in ["circle", "square"], "stim_type must be 'circle' or 'square'"
+        assert stim_type in [
+            "circle", "square"], "stim_type must be 'circle' or 'square'"
 
         self.win = win
         self.eccentricity = eccentricity
@@ -389,7 +404,7 @@ class CueStimulusArray:
             return visual.Circle(self.win, radius=self.size / 2, fillColor=None, lineColor="white", pos=pos,
                                  lineWidth=5)
         else:  # Square case
-            return visual.Rect(self.win, width=self.size, height=self.size, fillColor=None, lineColor="white", 
+            return visual.Rect(self.win, width=self.size, height=self.size, fillColor=None, lineColor="white",
                                lineWidth=5,
                                pos=pos, ori=45)  # Rotated 90° (actually 45° for a diamond shape)
 
