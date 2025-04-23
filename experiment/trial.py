@@ -497,9 +497,3 @@ class OutroTrial(Trial):
         self.session.fixation_dot.draw()
         self.session.win.flip()
 
-    def get_events(self):
-        events = Trial.get_events(self)
-        if events:
-            for key, t in events:
-                if key == self.session.mri_trigger:
-                    pass

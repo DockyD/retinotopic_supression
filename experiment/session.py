@@ -70,8 +70,9 @@ class SingletonSession(PylinkEyetrackerSession):
         self.radius_bar_aperture = self.eccentricity_stimuli - self.size_stimuli / 1.8
 
         self.fixation_dot = FixationStimulus(
-            self.win, size=self.settings["experiment"]["size_fixation"], position=(
-                0, self.stimulus_shift)
+            self.win,
+            size=self.settings["experiment"]["size_fixation"],
+            position=(0, self.stimulus_shift),
         )
         self.sweeping_bars = SweepingBarStimulus(
             self.win,
@@ -140,7 +141,7 @@ class SingletonSession(PylinkEyetrackerSession):
         for trial in self.trials:
             trial.run()
 
-        # self.close()
+        self.close()
 
     def create_trials(self, most_likely_distractor_location, include_instructions=True):
         """Create trials."""
@@ -170,8 +171,7 @@ class SingletonSession(PylinkEyetrackerSession):
                     # Handle either plain string or dict with 'text' and optional 'image'
                     if isinstance(entry, dict):
                         text = entry["text"].format(run=self.settings["run"])
-                        image_path = resolve_image_path(
-                            entry.get("image", None))
+                        image_path = resolve_image_path(entry.get("image", None))
                     else:
                         text = entry.format(run=self.settings["run"])
                         image_path = None
@@ -200,8 +200,7 @@ class SingletonSession(PylinkEyetrackerSession):
                         )
                     else:
                         instruction_trials.append(
-                            InstructionTrial(
-                                self, i, txt=text, image_path=image_path)
+                            InstructionTrial(self, i, txt=text, image_path=image_path)
                         )
 
                 self.trials = instruction_trials
@@ -215,15 +214,13 @@ class SingletonSession(PylinkEyetrackerSession):
                     # Handle either plain string or dict with 'text' and optional 'image'
                     if isinstance(entry, dict):
                         text = entry["text"].format(run=self.settings["run"])
-                        image_path = resolve_image_path(
-                            entry.get("image", None))
+                        image_path = resolve_image_path(entry.get("image", None))
                     else:
                         text = entry.format(run=self.settings["run"])
                         image_path = None
 
                     instruction_trials.append(
-                        InstructionTrial(self, i, txt=text,
-                                         image_path=image_path)
+                        InstructionTrial(self, i, txt=text, image_path=image_path)
                     )
 
                 self.trials = instruction_trials
@@ -277,8 +274,7 @@ class SingletonSession(PylinkEyetrackerSession):
         dummy_trial = DummyWaiterTrial(
             session=self,
             trial_nr=0,
-            phase_durations=[
-                np.inf, self.settings["durations"].get("blank", 1)],
+            phase_durations=[np.inf, self.settings["durations"]["blank"]],
             phase_names=["start_exp", "intro_dummy_scan"],
             draw_each_frame=False,
         )
@@ -324,7 +320,7 @@ class SingletonSession(PylinkEyetrackerSession):
                 session=self,
                 trial_nr=ix + 2,
                 phase_durations=[
-                    self.settings["durations"].get("blank", 1),
+                    self.settings["durations"]["blank"],
                     0.10,
                 ],
                 phase_names=["outro_dummy_scan", "end_exp"],
@@ -332,21 +328,21 @@ class SingletonSession(PylinkEyetrackerSession):
             )
         )
 
-        # show either a break screen or the end of experiment screen. Assumes 6 runs per session
-        if (self.settings["run"] == 6) or (self.settings["run"] == 12):
-            entry = self.instructions["fin"]
-            text = entry.format(run=self.settings["run"])
-            self.trials.append(
-                InstructionTrial(
-                    self, self.instructions["fin"], txt=text, image_path=None
-                )
-            )
+        # # show either a break screen or the end of experiment screen. Assumes 6 runs per session
+        # if (self.settings["run"] == 6) or (self.settings["run"] == 12):
+        #     entry = self.instructions["fin"]
+        #     text = entry.format(run=self.settings["run"])
+        #     self.trials.append(
+        #         InstructionTrial(
+        #             self, self.instructions["fin"], txt=text, image_path=None
+        #         )
+        #     )
 
-        else:
-            entry = self.instructions["break"]
-            text = entry.format(run=self.settings["run"])
-            self.trials.append(
-                InstructionTrial(
-                    self, self.instructions["break"], txt=text, image_path=None
-                )
-            )
+        # else:
+        #     entry = self.instructions["break"]
+        #     text = entry.format(run=self.settings["run"])
+        #     self.trials.append(
+        #         InstructionTrial(
+        #             self, self.instructions["break"], txt=text, image_path=None
+        #         )
+        #     )
