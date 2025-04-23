@@ -39,7 +39,7 @@ def main(subject, session, run, settings='default', use_eyetracker=True):
                    [7, 3, 1, 5],
                    [3, 7, 5, 1],
                    [7, 3, 5, 1])[subject % 8-1]
-        eyetracker_on = False,
+        eyetracker_on = False
         calibrate_eyetracker = False
 
     most_likely_distractor_location = hp_list[run//3-1]
@@ -52,6 +52,9 @@ def main(subject, session, run, settings='default', use_eyetracker=True):
     #     include_instructions = True
     if (run == 1):
         include_instructions = True
+
+    print(f"Eyetracker: {eyetracker_on}")
+    print(f"Calibrate eyetracker: {calibrate_eyetracker}")
 
     run_session = SingletonSession(output_str=output_str, subject=subject, session=session,
                                    output_dir=output_dir, settings_file=settings_fn,
