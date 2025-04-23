@@ -23,7 +23,7 @@ design:
   likely_distractor_probability: 0.67
 
 mri:
-  TR: 2.0  # seconds between volume acquisitions
+  TR: 1.6  # seconds between volume acquisitions
   TA: 2.0  # seconds to acquire one volume
   sync: t  # character used as flag for sync timing, default=‘5’
   n_dummy_scans: 4
@@ -41,9 +41,9 @@ durations:
   trial_wait: .5
   target: 1.5
   feedback: 1
-  iti: [1, 3, 5]
+  iti: [1.3, 2.9, 4.5]
   #  iti: [0.5]
-  blank: 19.9
+  blank: 14.3
 
 various:
   text_width: 10
