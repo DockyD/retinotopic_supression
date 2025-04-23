@@ -123,7 +123,7 @@ class SingletonTrial(Trial):
     ):
 
         trial_start_duration = session.settings["durations"].get("trial_start", 1)
-        cue_duration = session.settings["durations"].get("cue", 1)
+        cue_duration = session.settings["durations"].get("trial_wait", 1)
         target_duration = session.settings["durations"].get("target", 1)
         feedback_duration = session.settings["durations"].get("feedback", 1)
 
