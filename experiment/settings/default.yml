@@ -4,7 +4,7 @@ window:
   color: [0, 0, 0]
   fullscr: True
   winType: pyglet
-  screen: 0
+  screen: 1
   viewPos: [0, 0]
   allowStencil: True
 
@@ -15,8 +15,8 @@ monitor:
   # gamma: 1
   name: Spinoza_7T
   width: 70.9  # width of monitor (in cm)
-  distance: 194  # distance of participant from monitor (in cm)
-  gamma: 1
+  distance: 196  # distance of participant from monitor (in cm)
+  gamma: 2.1
 
 design:
   n_trials: 60
@@ -26,7 +26,7 @@ mri:
   TR: 1.6  # seconds between volume acquisitions
   TA: 2.0  # seconds to acquire one volume
   sync: t  # character used as flag for sync timing, default=‘5’
-  n_dummy_scans: 4
+  n_dummy_scans: 5
 
 experiment:
   size_stimuli: 1.5  # size of the stimuli in visual degrees

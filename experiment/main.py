@@ -45,7 +45,8 @@ def main(subject, session, run, settings="default", use_eyetracker=True):
         calibrate_eyetracker = False
 
     most_likely_distractor_location = hp_list[run // 3 - 1]
-    output_dir, output_str = get_output_dir_str(subject, session, "ret_sup", run)
+    output_dir, output_str = get_output_dir_str(
+        subject, session, "ret_sup", run)
     settings_fn, use_eyetracker = get_settings(settings)
     include_instructions = False
     print(most_likely_distractor_location)
@@ -101,4 +102,5 @@ if __name__ == "__main__":
 
     args = argparser.parse_args()
 
-    main(args.subject, args.session, args.run, args.settings, args.use_eyetracker)
+    main(args.subject, args.session, args.run,
+         args.settings, args.use_eyetracker)
