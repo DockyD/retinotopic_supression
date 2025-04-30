@@ -9,14 +9,14 @@ window:
   allowStencil: True
 
 monitor:
-  # name: BB_lab
-  # width: 52.6
-  # distance: 70  # in cm
-  # gamma: 1
-  name: Spinoza_7T
-  width: 70.9  # width of monitor (in cm)
-  distance: 196  # distance of participant from monitor (in cm)
-  gamma: 2.1
+  name: BB_lab
+  width: 52.6
+  distance: 70  # in cm
+  gamma: 1
+  # name: Spinoza_7T
+  # width: 70.9  # width of monitor (in cm)
+  # distance: 196  # distance of participant from monitor (in cm)
+  # gamma: 2.1
 
 design:
   n_trials: 60
@@ -33,7 +33,7 @@ experiment:
   size_fixation: 0.25  # size of the fixation in visual degrees
   eccentricity_stimulus: 4.0  # eccentricity of the stimuli in visual degrees
   stimulus_shift: -0.8 # shift the entire stimulus lower
-  keys: ["y", "b"]  # keys to be used for the experiment
+  keys: ["left", "up"]  # keys to be used for the experiment
   show_correct_feedback: False
   
 durations:
@@ -43,10 +43,10 @@ durations:
   feedback: 1
   iti: [1.3, 2.9, 4.5]
   #  iti: [0.5]
-  blank: 14.3
+  blank: 1
 
 various:
-  text_width: 10
+  text_width: 20
   text_height: .5
   text_color: [1, 1, 1]
   eyemovements_alert: True

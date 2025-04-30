@@ -155,7 +155,7 @@ class SingletonSession(PylinkEyetrackerSession):
             return abs_path if op.exists(abs_path) else None
 
         if include_instructions:
-            if most_likely_distractor_location == 10:
+            if most_likely_distractor_location < 100:
                 instruction_entries = [
                     self.instructions["intro"],
                     self.instructions["example1"],
@@ -183,8 +183,8 @@ class SingletonSession(PylinkEyetrackerSession):
                                 i,
                                 txt=text,
                                 image_path=image_path,
-                                bottom_txt="Press j to continue",
-                                keys=["j"],
+                                bottom_txt="Press up to continue",
+                                keys=["up"],
                             )
                         )
                     elif entry == self.instructions["example2"]:
@@ -194,8 +194,8 @@ class SingletonSession(PylinkEyetrackerSession):
                                 i,
                                 txt=text,
                                 image_path=image_path,
-                                bottom_txt="Press f to continue",
-                                keys=["f"],
+                                bottom_txt="Press left to continue",
+                                keys=["left"],
                             )
                         )
                     else:
@@ -271,22 +271,19 @@ class SingletonSession(PylinkEyetrackerSession):
         np.random.shuffle(itis)
 
         print("???", self.settings["durations"].get("blank", 1))
-        dummy_trial = DummyWaiterTrial(
-            session=self,
-            trial_nr=0,
-            phase_durations=[np.inf, self.settings["durations"]["blank"]],
-            phase_names=["start_exp", "intro_dummy_scan"],
-            draw_each_frame=False,
-        )
 
-        start_trial = WaitStartTriggerTrial(
-            session=self,
-            trial_nr=0,
-            phase_durations=[np.inf],
-            draw_each_frame=False,
+        self.trials.append(
+            OutroTrial(
+                session=self,
+                trial_nr=0,
+                phase_durations=[
+                    self.settings["durations"]["blank"],
+                    0.10,
+                ],
+                phase_names=["intro_dummy_scan", "start_exp"],
+                draw_each_frame=False,
+            )
         )
-        self.trials.append(dummy_trial)
-        self.trials.append(start_trial)
 
         # If practice, use different trial function which includes eye deviation beeps
         if self.settings["session"] == 1:
