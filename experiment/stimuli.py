@@ -128,9 +128,9 @@ class TargetStimulusArray(object):
         # assert 0 <= target_location < self.n_objects
 
         other_color = (
-            0.78, 0.14, -1) if distractor_color == 'green' else (-1, 0.33, -1)
+            0.78, 0.14, -1) if distractor_color == 'green' else (-1, 0.66, -1)
         distractor_color = (
-            0.78, 0.14, -1) if distractor_color == 'red' else (-1, 0.33, -1)
+            0.78, 0.14, -1) if distractor_color == 'red' else (-1, 0.66, -1)
         other_orientation = 90. if target_orientation == 0.0 else 0.0
 
         print(f'Setting up trial: distractor={distractor_location},\ntarget={target_location},\ndistractor_color={distractor_color},\ntarget_orientation={target_orientation}\n other_color={other_color},\nother_orientation={other_orientation}')

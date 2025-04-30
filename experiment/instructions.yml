@@ -9,7 +9,7 @@ intro: |
   Once you have found this bar, you will need to report whether
   this uniquely oriented bar has a grey dot inside it.
 
-  If it has a dot, then you need to press the 'right' button.
+  If it has a dot, then you need to press the 'up' button.
   if it doesnt have a dot, then you will need to press the
   'left' direction button
 
@@ -29,7 +29,7 @@ example1:
     are horizontal? This is your search target.
 
     Notice that there is a grey dot inside this line? On this trial,
-    a correct answer would be to press the 'right' button.
+    a correct answer would be to press the 'up' button.
   image: images/noDist.png
 
 example2:
