@@ -154,7 +154,7 @@ class SingletonSession(PylinkEyetrackerSession):
             return abs_path if op.exists(abs_path) else None
 
         if include_instructions:
-            if most_likely_distractor_location == 10:
+            if most_likely_distractor_location < 10:
                 instruction_entries = [
                     self.instructions["intro"],
                     self.instructions["example1"],
@@ -184,7 +184,7 @@ class SingletonSession(PylinkEyetrackerSession):
                                 txt=text,
                                 image_path=image_path,
                                 bottom_txt="Press j to continue",
-                                keys=["j"],
+                                keys=["right"],
                             )
                         )
                     elif entry == self.instructions["example2"]:
@@ -195,7 +195,7 @@ class SingletonSession(PylinkEyetrackerSession):
                                 txt=text,
                                 image_path=image_path,
                                 bottom_txt="Press f to continue",
-                                keys=["f"],
+                                keys=["left"],
                             )
                         )
                     else:
