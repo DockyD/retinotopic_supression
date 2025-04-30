@@ -183,8 +183,8 @@ class SingletonSession(PylinkEyetrackerSession):
                                 i,
                                 txt=text,
                                 image_path=image_path,
-                                bottom_txt="Press up to continue",
-                                keys=["up"],
+                                bottom_txt="Press left to continue",
+                                keys=["left"],
                             )
                         )
                     elif entry == self.instructions["example2"]:
@@ -194,8 +194,8 @@ class SingletonSession(PylinkEyetrackerSession):
                                 i,
                                 txt=text,
                                 image_path=image_path,
-                                bottom_txt="Press left to continue",
-                                keys=["left"],
+                                bottom_txt="Press up to continue",
+                                keys=["up"],
                             )
                         )
                     else:
