@@ -81,6 +81,8 @@ class SingletonSession(PylinkEyetrackerSession):
             fov_size=self.radius_bar_aperture * 2,
             #  bar_width=self.settings['bar_stimulus']['bar_width'],)
             bar_width=(self.radius_bar_aperture * 2) / 8,
+            rest_duration=self.settings["bar_stimulus"]["rest_duration"],
+            break_duration=self.settings["bar_stimulus"]["break_duration"],
         )
         self.backgroundcircle = BackgroundCircle(
             self.win,
