@@ -341,8 +341,8 @@ class SweepingBarStimulus:
             tex="sqrXsqr",
             mask=None,
             size=(bar_width, fov_size),
-            sf=self.bar_width * 2.4,
-            phase=0.5,
+            sf=self.bar_width*2.28,
+            phase=0,
             contrast=self.contrast,
             # Default orientation
             interpolate=False,
