@@ -325,7 +325,7 @@ class SweepingBarStimulus:
             "down",
             "rest",
             "up",
-            "break",
+            "rest",
         ]
         self.current_direction_index = 0  # Start with the first direction
         # Keeps track of how long we've been in the current sweep
@@ -333,7 +333,7 @@ class SweepingBarStimulus:
 
         # ✅ Compute how long a full sweep takes
         # Ensure full traversal of FOV
-        self.sweep_duration = (fov_size + self.bar_width * 2) / speed
+        self.sweep_duration = (fov_size + self.bar_width) / speed
 
         # ✅ Create the **rectangular bar** with a checkerboard pattern
         self.bar = visual.GratingStim(
