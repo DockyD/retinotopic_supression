@@ -326,6 +326,7 @@ class SweepingBarStimulus:
             "rest",
             "up",
             "rest",
+            "break",
         ]
         self.current_direction_index = 0  # Start with the first direction
         # Keeps track of how long we've been in the current sweep

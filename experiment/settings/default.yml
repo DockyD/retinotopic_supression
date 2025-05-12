@@ -55,7 +55,7 @@ various:
 bar_stimulus:
   bar_width: 1.5
   speed: 0.277777777
-  rest_duration: 1.6
-  break_duration: 9.6
+  rest_duration: 4.8
+  break_duration: 4.8
 
 # eyetracker:True
