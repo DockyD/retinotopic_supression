@@ -54,7 +54,7 @@ various:
 
 bar_stimulus:
   bar_width: 1.5
-  speed: 0.277777777
+  speed: 0.168
   rest_duration: 4.8
   break_duration: 4.8
 
