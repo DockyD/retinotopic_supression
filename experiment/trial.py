@@ -118,7 +118,7 @@ class SingletonTrial(Trial):
         distractor_color=None,
         target_orientation=None,
         dot_presence=None,
-        most_likely_distractor_location=1,
+        most_likely_distractor_location=None,
         **kwargs,
     ):
 
@@ -196,6 +196,7 @@ class SingletonTrial(Trial):
             self.parameters["target_location"] = target_location
 
         self.parameters["correct"] = np.nan
+        self.parameters["HPL_distractor"] = most_likely_distractor_location
         self.responded = False
 
         # for the dot version

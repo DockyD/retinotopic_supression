@@ -24,7 +24,7 @@ def main(subject, session, run, settings="default", use_eyetracker=True):
     as well as whether to use eyetracker.
     Automatically calibrates every block if used.
     """
-    eyetracker_on = use_eyetracker
+    eyetracker_on = True
     calibrate_eyetracker = True
 
     hp_list = [10, 10, 10, 10]
@@ -44,7 +44,7 @@ def main(subject, session, run, settings="default", use_eyetracker=True):
         eyetracker_on = False
         calibrate_eyetracker = False
 
-    most_likely_distractor_location = hp_list[run // 3 - 1]
+    most_likely_distractor_location = hp_list[(run-1) // 3 + (session-1) * 2]
     output_dir, output_str = get_output_dir_str(
         subject, session, "ret_sup", run)
     settings_fn, use_eyetracker = get_settings(settings)

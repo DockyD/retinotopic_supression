@@ -185,8 +185,8 @@ class SingletonSession(PylinkEyetrackerSession):
                                 i,
                                 txt=text,
                                 image_path=image_path,
-                                bottom_txt="Press j to continue",
-                                keys=["j"],
+                                bottom_txt="Press left to continue",
+                                keys=["left"],
                             )
                         )
                     elif entry == self.instructions["example2"]:
@@ -196,8 +196,8 @@ class SingletonSession(PylinkEyetrackerSession):
                                 i,
                                 txt=text,
                                 image_path=image_path,
-                                bottom_txt="Press f to continue",
-                                keys=["f"],
+                                bottom_txt="Press up to continue",
+                                keys=["up"],
                             )
                         )
                     else:
@@ -273,25 +273,21 @@ class SingletonSession(PylinkEyetrackerSession):
         np.random.shuffle(itis)
 
         print("???", self.settings["durations"].get("blank", 1))
-        dummy_trial = DummyWaiterTrial(
-            session=self,
-            trial_nr=0,
-            phase_durations=[np.inf, self.settings["durations"]["blank"]],
-            phase_names=["start_exp", "intro_dummy_scan"],
-            draw_each_frame=False,
-        )
-
-        start_trial = WaitStartTriggerTrial(
-            session=self,
-            trial_nr=0,
-            phase_durations=[np.inf],
-            draw_each_frame=False,
-        )
-        self.trials.append(dummy_trial)
-        self.trials.append(start_trial)
 
         # If practice, use different trial function which includes eye deviation beeps
         if self.settings["session"] == 1:
+            self.trials.append(
+                OutroTrial(
+                    session=self,
+                    trial_nr=0,
+                    phase_durations=[
+                        15,
+                        0.10,
+                    ],
+                    phase_names=["intro_dummy_scan", "start_exp"],
+                    draw_each_frame=False,
+                )
+            )
             for ix, iti in enumerate(itis):
                 self.trials.append(
                     SingletonTrial_training(
@@ -303,7 +299,41 @@ class SingletonSession(PylinkEyetrackerSession):
                         most_likely_distractor_location=most_likely_distractor_location,
                     )
                 )
+                    # show either a break screen or the end of experiment screen. Assumes 6 runs per session
+            if (self.settings["run"] == 6):
+                entry = self.instructions["fin"]
+                text = entry.format(run=self.settings["run"])
+                self.trials.append(
+                    InstructionTrial(
+                        self, self.instructions["fin"], txt=text, image_path=None
+                    )
+                )
+
+            else:
+                entry = self.instructions["break"]
+                text = entry.format(run=self.settings["run"])
+                self.trials.append(
+                    InstructionTrial(
+                        self, self.instructions["break"], txt=text, image_path=None
+                    )
+                )
         else:
+            dummy_trial = DummyWaiterTrial(
+                session=self,
+                trial_nr=0,
+                phase_durations=[np.inf, self.settings["durations"]["blank"]],
+                phase_names=["start_exp", "intro_dummy_scan"],
+                draw_each_frame=False,
+            )
+
+            start_trial = WaitStartTriggerTrial(
+                session=self,
+                trial_nr=0,
+                phase_durations=[np.inf],
+                draw_each_frame=False,
+            )
+            self.trials.append(dummy_trial)
+            self.trials.append(start_trial)
             for ix, iti in enumerate(itis):
                 self.trials.append(
                     SingletonTrial(
@@ -329,22 +359,3 @@ class SingletonSession(PylinkEyetrackerSession):
                 draw_each_frame=False,
             )
         )
-
-        # # show either a break screen or the end of experiment screen. Assumes 6 runs per session
-        # if (self.settings["run"] == 6) or (self.settings["run"] == 12):
-        #     entry = self.instructions["fin"]
-        #     text = entry.format(run=self.settings["run"])
-        #     self.trials.append(
-        #         InstructionTrial(
-        #             self, self.instructions["fin"], txt=text, image_path=None
-        #         )
-        #     )
-
-        # else:
-        #     entry = self.instructions["break"]
-        #     text = entry.format(run=self.settings["run"])
-        #     self.trials.append(
-        #         InstructionTrial(
-        #             self, self.instructions["break"], txt=text, image_path=None
-        #         )
-        #     )
