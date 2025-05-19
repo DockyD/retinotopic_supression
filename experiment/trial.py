@@ -196,7 +196,10 @@ class SingletonTrial(Trial):
             self.parameters["target_location"] = target_location
 
         self.parameters["correct"] = np.nan
-        self.parameters["HPL_distractor"] = most_likely_distractor_location
+        if most_likely_distractor_location==10:
+            self.parameters["HPL_distractor"] = None
+        else:
+            self.parameters["HPL_distractor"] = most_likely_distractor_location
         self.responded = False
 
         # for the dot version

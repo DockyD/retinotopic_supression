@@ -299,7 +299,21 @@ class SingletonSession(PylinkEyetrackerSession):
                         most_likely_distractor_location=most_likely_distractor_location,
                     )
                 )
-                    # show either a break screen or the end of experiment screen. Assumes 6 runs per session
+
+            self.trials.append(
+                OutroTrial(
+                    session=self,
+                    trial_nr=ix + 2,
+                    phase_durations=[
+                        self.settings["durations"]["blank"],
+                        0.10,
+                    ],
+                    phase_names=["outro_dummy_scan", "end_exp"],
+                    draw_each_frame=False,
+                )
+            )
+
+            # show either a break screen or the end of experiment screen. Assumes 6 runs per session
             if (self.settings["run"] == 6):
                 entry = self.instructions["fin"]
                 text = entry.format(run=self.settings["run"])
@@ -317,6 +331,7 @@ class SingletonSession(PylinkEyetrackerSession):
                         self, self.instructions["break"], txt=text, image_path=None
                     )
                 )
+            
         else:
             dummy_trial = DummyWaiterTrial(
                 session=self,
@@ -346,16 +361,15 @@ class SingletonSession(PylinkEyetrackerSession):
                     )
                 )
 
-        # self.trials.append(BlankTrial(self, ix + 2))
-        self.trials.append(
-            OutroTrial(
-                session=self,
-                trial_nr=ix + 2,
-                phase_durations=[
-                    self.settings["durations"]["blank"],
-                    0.10,
-                ],
-                phase_names=["outro_dummy_scan", "end_exp"],
-                draw_each_frame=False,
+            self.trials.append(
+                OutroTrial(
+                    session=self,
+                    trial_nr=ix + 2,
+                    phase_durations=[
+                        self.settings["durations"]["blank"],
+                        0.10,
+                    ],
+                    phase_names=["outro_dummy_scan", "end_exp"],
+                    draw_each_frame=False,
+                )
             )
-        )
