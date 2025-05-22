@@ -44,9 +44,17 @@ def main(subject, session, run, settings="default", use_eyetracker=True):
         eyetracker_on = False
         calibrate_eyetracker = False
 
-    most_likely_distractor_location = hp_list[(run-1) // 3 + (session-1) * 2]
-    output_dir, output_str = get_output_dir_str(
-        subject, session, "ret_sup", run)
+    most_likely_distractor_location = hp_list[(run - 1) // 3 + (session - 1) * 2]
+    output_dir, output_str = get_output_dir_str(subject, session, "ret_sup", run)
+    if os.path.exists(output_dir):
+        raise ValueError(
+            f"""\n
+            ================================\n
+            =========WATCH OUT!!!===========\n
+            Output directory already exists.\n 
+            ====Please check your input.====\n
+            ================================\n"""
+        )
     settings_fn, use_eyetracker = get_settings(settings)
     include_instructions = False
     print(most_likely_distractor_location)
@@ -102,5 +110,4 @@ if __name__ == "__main__":
 
     args = argparser.parse_args()
 
-    main(args.subject, args.session, args.run,
-         args.settings, args.use_eyetracker)
+    main(args.subject, args.session, args.run, args.settings, args.use_eyetracker)
