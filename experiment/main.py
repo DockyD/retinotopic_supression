@@ -34,18 +34,20 @@ def main(subject, session, run, settings="default", use_eyetracker=True):
         hp_list = (
             [1, 5, 3, 7],
             [1, 5, 7, 3],
-            [5, 1, 3, 7],
+            [3, 7, 5, 1],
             [5, 1, 7, 3],
             [3, 7, 1, 5],
             [7, 3, 1, 5],
-            [3, 7, 5, 1],
+            [5, 1, 3, 7],
             [7, 3, 5, 1],
         )[subject % 8 - 1]
         eyetracker_on = False
         calibrate_eyetracker = False
 
-    most_likely_distractor_location = hp_list[(run - 1) // 3 + (session - 1) * 2]
-    output_dir, output_str = get_output_dir_str(subject, session, "ret_sup", run)
+    most_likely_distractor_location = hp_list[(
+        run - 1) // 3 + (session - 2) * 2]
+    output_dir, output_str = get_output_dir_str(
+        subject, session, "ret_sup", run)
     if os.path.exists(output_dir):
         raise ValueError(
             f"""\n
@@ -110,4 +112,5 @@ if __name__ == "__main__":
 
     args = argparser.parse_args()
 
-    main(args.subject, args.session, args.run, args.settings, args.use_eyetracker)
+    main(args.subject, args.session, args.run,
+         args.settings, args.use_eyetracker)
