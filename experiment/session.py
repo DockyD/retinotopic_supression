@@ -117,7 +117,7 @@ class SingletonSession(PylinkEyetrackerSession):
 
         self.rt_clock = core.Clock()
 
-        self.pix_per_deg = self.win.size[0] / self.win.monitor.getWidth()
+        self.pix_stimulus_shift = self.pix_per_deg * self.stimulus_shift
         self.soundfile = str(Path(__file__).parent / "beep.wav")
         self.beep = Sound(str(self.soundfile))
         self.beep.setSound(800, secs=0.02)
@@ -314,7 +314,7 @@ class SingletonSession(PylinkEyetrackerSession):
             )
 
             # show either a break screen or the end of experiment screen. Assumes 6 runs per session
-            if (self.settings["run"] == 6):
+            if self.settings["run"] == 6:
                 entry = self.instructions["fin"]
                 text = entry.format(run=self.settings["run"])
                 self.trials.append(
@@ -331,7 +331,7 @@ class SingletonSession(PylinkEyetrackerSession):
                         self, self.instructions["break"], txt=text, image_path=None
                     )
                 )
-            
+
         else:
             dummy_trial = DummyWaiterTrial(
                 session=self,

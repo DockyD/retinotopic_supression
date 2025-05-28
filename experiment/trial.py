@@ -196,7 +196,7 @@ class SingletonTrial(Trial):
             self.parameters["target_location"] = target_location
 
         self.parameters["correct"] = np.nan
-        if most_likely_distractor_location==10:
+        if most_likely_distractor_location == 10:
             self.parameters["HPL_distractor"] = None
         else:
             self.parameters["HPL_distractor"] = most_likely_distractor_location
@@ -331,9 +331,9 @@ class SingletonTrial_training(SingletonTrial):
                         sample = np.array(el_smp.getLeftEye().getGaze())
                     elif el_smp.isRightSample():
                         sample = np.array(el_smp.getRightEye().getGaze())
-                    fix_dist_pix = np.linalg.norm(
-                        (np.array(self.session.win.size) / 2) - np.array(sample)
-                    )
+                    fix_dist_centre = np.array(self.session.win.size) / 2
+                    fix_dist_centre[0] += self.session.pix_stimulus_shift
+                    fix_dist_pix = np.linalg.norm(fix_dist_centre - np.array(sample))
                     fix_dist_deg = fix_dist_pix / self.session.pix_per_deg
                     print(
                         f"played: {self.audio_played}, fix_dist_deg: {fix_dist_deg}, fix_dist_pix: {fix_dist_pix}, pix_per_deg: {self.session.pix_per_deg}"
@@ -500,4 +500,3 @@ class OutroTrial(Trial):
         self.session.fixation_dot.color = "white"
         self.session.fixation_dot.draw()
         self.session.win.flip()
-
