@@ -332,12 +332,17 @@ class SingletonTrial_training(SingletonTrial):
                     elif el_smp.isRightSample():
                         sample = np.array(el_smp.getRightEye().getGaze())
                     fix_dist_centre = np.array(self.session.win.size) / 2
-                    fix_dist_centre[0] += self.session.pix_stimulus_shift
+                    fix_dist_centre[1] -= self.session.pix_stimulus_shift
                     fix_dist_pix = np.linalg.norm(fix_dist_centre - np.array(sample))
                     fix_dist_deg = fix_dist_pix / self.session.pix_per_deg
-                    print(
-                        f"played: {self.audio_played}, fix_dist_deg: {fix_dist_deg}, fix_dist_pix: {fix_dist_pix}, pix_per_deg: {self.session.pix_per_deg}"
-                    )
+                    # print(
+                    #     f"""played: {self.audio_played},
+                    #     fix_dist_centre: {fix_dist_centre},
+                    #     sample: {sample},
+                    #     fix_dist_deg: {fix_dist_deg},
+                    #     fix_dist_pix: {fix_dist_pix},
+                    #     pix_per_deg: {self.session.pix_per_deg}"""
+                    # )
                     if (
                         fix_dist_deg
                         > self.session.settings["various"]["gaze_threshold_deg"]
