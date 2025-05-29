@@ -307,13 +307,70 @@ class SingletonTrial_training(SingletonTrial):
             **kwargs,
         )
         self.audio_played = False
+        self.gaze_x, self.gaze_y, self.gaze_time = [], [], []
 
+    def drift_correction(self):
+        """Perform drift correction by sampling gaze positions for a short time."""
+        drift_x = []
+        drift_y = []
+        drift_times = []
+
+        drift_start = core.getTime()
+        while core.getTime() - drift_start < 0.2:  # 200ms window
+            el_smp = self.session.tracker.getNewestSample()
+            if el_smp is None:
+                continue
+            if el_smp.isLeftSample():
+                gaze = el_smp.getLeftEye().getGaze()
+            elif el_smp.isRightSample():
+                gaze = el_smp.getRightEye().getGaze()
+            else:
+                continue
+
+            drift_x.append(gaze[0])
+            drift_y.append(gaze[1])
+            drift_times.append(core.getTime())
+
+        drift_x = np.array(drift_x)
+        drift_y = np.array(drift_y)
+        self.drift = (np.mean(drift_x), np.mean(drift_y))
+
+    def check_fixation_windowed(self):
+        el_smp = self.session.tracker.getNewestSample()
+        if el_smp is None:
+            return True  # assume OK if no data
+
+        if el_smp.isLeftSample():
+            sample = np.array(el_smp.getLeftEye().getGaze())
+        elif el_smp.isRightSample():
+            sample = np.array(el_smp.getRightEye().getGaze())
+        else:
+            return True
+
+        self.gaze_x.append(sample[0])
+        self.gaze_y.append(sample[1])
+        self.gaze_time.append(core.getTime() * 1000)  # ms
+
+        d_times = np.array(self.gaze_time) - self.gaze_time[-1]
+        idx = np.where(d_times > -30)[0]
+        if idx.size < 2:
+            return True
+
+        x_ = np.array(self.gaze_x)[idx] - self.drift[0]
+        y_ = np.array(self.gaze_y)[idx] - self.drift[1]
+        angles = np.hypot(x_, y_) / self.session.pix_per_deg
+
+        if all(angles > self.session.settings["various"]["gaze_threshold_deg"]):
+            return False  # fixation broken
+        return True
+    
     def draw(self):
 
         if self.phase == 0:
             self.session.fixation_dot.color = "white"
         elif self.phase == 1:
             self.session.fixation_dot.color = "white"
+            self.drift_correction()
 
         if self.phase == 2:
             if self.stimulus_onset is None:
@@ -325,35 +382,13 @@ class SingletonTrial_training(SingletonTrial):
                 self.session.eyetracker_on
                 and self.session.settings["various"]["eyemovements_alert"]
             ):
-                el_smp = self.session.tracker.getNewestSample()
-                if el_smp != None:
-                    if el_smp.isLeftSample():
-                        sample = np.array(el_smp.getLeftEye().getGaze())
-                    elif el_smp.isRightSample():
-                        sample = np.array(el_smp.getRightEye().getGaze())
-                    fix_dist_centre = np.array(self.session.win.size) / 2
-                    fix_dist_centre[1] -= self.session.pix_stimulus_shift
-                    fix_dist_pix = np.linalg.norm(fix_dist_centre - np.array(sample))
-                    fix_dist_deg = fix_dist_pix / self.session.pix_per_deg
-                    # print(
-                    #     f"""played: {self.audio_played},
-                    #     fix_dist_centre: {fix_dist_centre},
-                    #     sample: {sample},
-                    #     fix_dist_deg: {fix_dist_deg},
-                    #     fix_dist_pix: {fix_dist_pix},
-                    #     pix_per_deg: {self.session.pix_per_deg}"""
-                    # )
-                    if (
-                        fix_dist_deg
-                        > self.session.settings["various"]["gaze_threshold_deg"]
-                    ):
-                        if not self.audio_played:
-                            self.session.beep.play()
-                            core.wait(0.03)
-                            self.session.beep.stop()
-                            # playsound(self.session.soundfile)
-                            self.audio_played = True
-                            self.session.beep_count += 1
+                fix_ok = self.check_fixation_windowed()
+                if not fix_ok and not self.audio_played:
+                    self.session.beep.play()
+                    core.wait(0.03)
+                    self.session.beep.stop()
+                    self.audio_played = True
+                    self.session.beep_count += 1
 
         self.session.sweeping_bars.draw()
 
