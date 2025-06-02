@@ -309,7 +309,7 @@ class SingletonTrial_training(SingletonTrial):
         )
         self.audio_played = False
         self.trial_frame_count = 0
-        self.gaze_x = deque(maxlen=60)  # 假设最多每帧采样一次，60个样本 ≈ 1000ms @ 60Hz
+        self.gaze_x = deque(maxlen=60)
         self.gaze_y = deque(maxlen=60)
         self.gaze_time = deque(maxlen=60)
         self.drift_x = deque(maxlen=60)
