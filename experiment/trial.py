@@ -313,6 +313,47 @@ class SingletonTrial_training(SingletonTrial):
         self.gaze_y = deque(maxlen=60)
         self.gaze_time = deque(maxlen=60)
 
+    def drift_correction_step(self):
+        """Call this every frame during phase 1 to incrementally collect gaze for drift correction."""
+        now = core.getTime()
+
+        if not self.drift_collecting:
+            self.drift_collecting = True
+            self.drift_start_time = now
+            self.drift_x.clear()
+            self.drift_y.clear()
+            self.drift_times.clear()
+            return
+
+        if now - self.drift_start_time < 0.2:  # still collecting
+            el_smp = self.session.tracker.getNewestSample()
+            if el_smp is None:
+                return
+
+            if el_smp.isLeftSample():
+                gaze = el_smp.getLeftEye().getGaze()
+            elif el_smp.isRightSample():
+                gaze = el_smp.getRightEye().getGaze()
+            else:
+                return
+
+            if gaze is not None:
+                self.drift_x.append(gaze[0])
+                self.drift_y.append(gaze[1])
+                self.drift_times.append(now)
+            return
+
+        # Finished collection
+        if len(self.drift_x) < 5:
+            screen_center = np.array(self.session.win.size) / 2
+            screen_center[1] -= self.session.pix_stimulus_shift
+            self.drift = tuple(screen_center)
+        else:
+            self.drift = (np.mean(self.drift_x), np.mean(self.drift_y))
+
+        self.drift_collecting = False  # mark done
+        self.phase += 1  # proceed to phase 2 when done
+
     def check_fixation_windowed(self):
         if self.trial_frame_count % 2 != 0:
             return True
@@ -354,44 +395,7 @@ class SingletonTrial_training(SingletonTrial):
             self.session.fixation_dot.color = "white"
         elif self.phase == 1:
             self.session.fixation_dot.color = "white"
-            """Perform drift correction by averaging gaze samples within 200ms window."""
-            drift_x = deque(maxlen=60)
-            drift_y = deque(maxlen=60)
-            drift_times = deque(maxlen=60)
-
-            drift_start = core.getTime()
-            last_sample_time = 0
-            sample_interval = 1.0 / 30.0
-
-            while core.getTime() - drift_start < 0.2:  # 200ms window
-                now = core.getTime()
-                if now - last_sample_time < sample_interval:
-                    continue
-
-                last_sample_time = now
-
-                el_smp = self.session.tracker.getNewestSample()
-                if el_smp is None:
-                    continue
-
-                if el_smp.isLeftSample():
-                    gaze = el_smp.getLeftEye().getGaze()
-                elif el_smp.isRightSample():
-                    gaze = el_smp.getRightEye().getGaze()
-                else:
-                    continue
-
-                if gaze is not None:
-                    drift_x.append(gaze[0])
-                    drift_y.append(gaze[1])
-                    drift_times.append(now)
-
-            if len(drift_x) < 5:
-                screen_center = np.array(self.session.win.size) / 2
-                screen_center[1] -= self.session.pix_stimulus_shift
-                self.drift = tuple(screen_center)
-            else:
-                self.drift = (np.mean(drift_x), np.mean(drift_y))
+            self.drift_correction_step()
 
         if self.phase == 2:
             if self.stimulus_onset is None:
