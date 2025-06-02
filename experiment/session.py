@@ -318,18 +318,14 @@ class SingletonSession(PylinkEyetrackerSession):
                 entry = self.instructions["fin"]
                 text = entry.format(run=self.settings["run"])
                 self.trials.append(
-                    InstructionTrial(
-                        self, self.instructions["fin"], txt=text, image_path=None
-                    )
+                    InstructionTrial(self, ix + 3, txt=text, image_path=None)
                 )
 
             else:
                 entry = self.instructions["break"]
                 text = entry.format(run=self.settings["run"])
                 self.trials.append(
-                    InstructionTrial(
-                        self, self.instructions["break"], txt=text, image_path=None
-                    )
+                    InstructionTrial(self, ix + 3, txt=text, image_path=None)
                 )
 
         else:
