@@ -314,16 +314,26 @@ class SingletonTrial_training(SingletonTrial):
         self.gaze_time = deque(maxlen=60)
 
     def drift_correction(self):
-        """Perform drift correction by sampling gaze positions for a short time."""
+        """Perform drift correction by averaging gaze samples within 200ms window."""
         drift_x = deque(maxlen=60)
         drift_y = deque(maxlen=60)
         drift_times = deque(maxlen=60)
 
         drift_start = core.getTime()
+        last_sample_time = 0
+        sample_interval = 1.0 / 120.0
+
         while core.getTime() - drift_start < 0.2:  # 200ms window
+            now = core.getTime()
+            if now - last_sample_time < sample_interval:
+                continue
+
+            last_sample_time = now
+
             el_smp = self.session.tracker.getNewestSample()
             if el_smp is None:
                 continue
+
             if el_smp.isLeftSample():
                 gaze = el_smp.getLeftEye().getGaze()
             elif el_smp.isRightSample():
@@ -331,11 +341,17 @@ class SingletonTrial_training(SingletonTrial):
             else:
                 continue
 
-            drift_x.append(gaze[0])
-            drift_y.append(gaze[1])
-            drift_times.append(core.getTime())
+            if gaze is not None:
+                drift_x.append(gaze[0])
+                drift_y.append(gaze[1])
+                drift_times.append(now)
 
-        self.drift = (np.mean(drift_x), np.mean(drift_y))
+        if len(drift_x) < 5:
+            screen_center = np.array(self.session.win.size) / 2
+            screen_center[1] -= self.session.pix_stimulus_shift
+            self.drift = tuple(screen_center)
+        else:
+            self.drift = (np.mean(drift_x), np.mean(drift_y))
 
     def check_fixation_windowed(self):
         if self.trial_frame_count % 2 != 0:
@@ -371,7 +387,7 @@ class SingletonTrial_training(SingletonTrial):
         if np.all(angles > self.session.settings["various"]["gaze_threshold_deg"]):
             return False
         return True
-    
+
     def draw(self):
         self.trial_frame_count += 1
         if self.phase == 0:
