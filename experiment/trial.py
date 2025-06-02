@@ -1,6 +1,7 @@
 from exptools2.core import Trial
 from psychopy.visual import TextStim, ImageStim
 import numpy as np
+from collections import deque
 from psychopy import core
 import os.path as op
 from psychopy.core import getTime
@@ -307,13 +308,16 @@ class SingletonTrial_training(SingletonTrial):
             **kwargs,
         )
         self.audio_played = False
-        self.gaze_x, self.gaze_y, self.gaze_time = [], [], []
+        self.trial_frame_count = 0
+        self.gaze_x = deque(maxlen=60)  # 假设最多每帧采样一次，60个样本 ≈ 1000ms @ 60Hz
+        self.gaze_y = deque(maxlen=60)
+        self.gaze_time = deque(maxlen=60)
 
     def drift_correction(self):
         """Perform drift correction by sampling gaze positions for a short time."""
-        drift_x = []
-        drift_y = []
-        drift_times = []
+        drift_x = deque(maxlen=60)
+        drift_y = deque(maxlen=60)
+        drift_times = deque(maxlen=60)
 
         drift_start = core.getTime()
         while core.getTime() - drift_start < 0.2:  # 200ms window
@@ -331,28 +335,32 @@ class SingletonTrial_training(SingletonTrial):
             drift_y.append(gaze[1])
             drift_times.append(core.getTime())
 
-        drift_x = np.array(drift_x)
-        drift_y = np.array(drift_y)
         self.drift = (np.mean(drift_x), np.mean(drift_y))
 
     def check_fixation_windowed(self):
+        if self.trial_frame_count % 2 != 0:
+            return True
         el_smp = self.session.tracker.getNewestSample()
         if el_smp is None:
-            return True  # assume OK if no data
+            return True
 
         if el_smp.isLeftSample():
-            sample = np.array(el_smp.getLeftEye().getGaze())
+            sample = el_smp.getLeftEye().getGaze()
         elif el_smp.isRightSample():
-            sample = np.array(el_smp.getRightEye().getGaze())
+            sample = el_smp.getRightEye().getGaze()
         else:
             return True
 
+        now = core.getTime() * 1000  # ms
         self.gaze_x.append(sample[0])
         self.gaze_y.append(sample[1])
-        self.gaze_time.append(core.getTime() * 1000)  # ms
+        self.gaze_time.append(now)
 
-        d_times = np.array(self.gaze_time) - self.gaze_time[-1]
+        # Convert only necessary portion
+        times = np.array(self.gaze_time)
+        d_times = times - now
         idx = np.where(d_times > -30)[0]
+
         if idx.size < 2:
             return True
 
@@ -360,12 +368,12 @@ class SingletonTrial_training(SingletonTrial):
         y_ = np.array(self.gaze_y)[idx] - self.drift[1]
         angles = np.hypot(x_, y_) / self.session.pix_per_deg
 
-        if all(angles > self.session.settings["various"]["gaze_threshold_deg"]):
-            return False  # fixation broken
+        if np.all(angles > self.session.settings["various"]["gaze_threshold_deg"]):
+            return False
         return True
     
     def draw(self):
-
+        self.trial_frame_count += 1
         if self.phase == 0:
             self.session.fixation_dot.color = "white"
         elif self.phase == 1:
