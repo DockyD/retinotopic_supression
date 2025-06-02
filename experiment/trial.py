@@ -356,7 +356,6 @@ class SingletonTrial_training(SingletonTrial):
             self.drift = (np.mean(self.drift_x), np.mean(self.drift_y))
 
         self.drift_collecting = False  # mark done
-        self.phase += 1  # proceed to phase 2 when done
 
     def check_fixation_windowed(self):
         if self.trial_frame_count % 2 != 0:
