@@ -312,6 +312,10 @@ class SingletonTrial_training(SingletonTrial):
         self.gaze_x = deque(maxlen=60)  # 假设最多每帧采样一次，60个样本 ≈ 1000ms @ 60Hz
         self.gaze_y = deque(maxlen=60)
         self.gaze_time = deque(maxlen=60)
+        self.drift_x = deque(maxlen=60)
+        self.drift_y = deque(maxlen=60)
+        self.drift_times = deque(maxlen=60)
+        self.drift_collecting = False
 
     def drift_correction_step(self):
         """Call this every frame during phase 1 to incrementally collect gaze for drift correction."""
