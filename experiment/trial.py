@@ -321,7 +321,7 @@ class SingletonTrial_training(SingletonTrial):
 
         drift_start = core.getTime()
         last_sample_time = 0
-        sample_interval = 1.0 / 120.0
+        sample_interval = 1.0 / 30.0
 
         while core.getTime() - drift_start < 0.2:  # 200ms window
             now = core.getTime()
