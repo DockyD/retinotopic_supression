@@ -117,7 +117,6 @@ class SingletonSession(PylinkEyetrackerSession):
 
         self.rt_clock = core.Clock()
 
-        self.pix_stimulus_shift = self.pix_per_deg * self.stimulus_shift
         self.soundfile = str(Path(__file__).parent / "beep.wav")
         self.beep = Sound(str(self.soundfile))
         self.beep.setSound(800, secs=0.02)
