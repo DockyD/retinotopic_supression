@@ -123,7 +123,8 @@ class SingletonTrial(Trial):
         **kwargs,
     ):
 
-        trial_start_duration = session.settings["durations"].get("trial_start", 1)
+        trial_start_duration = session.settings["durations"].get(
+            "trial_start", 1)
         cue_duration = session.settings["durations"].get("trial_wait", 1)
         target_duration = session.settings["durations"].get("target", 1)
         feedback_duration = session.settings["durations"].get("feedback", 1)
@@ -135,7 +136,8 @@ class SingletonTrial(Trial):
             feedback_duration,
             iti,
         ]
-        phase_names = ["trial_start", "pre-target", "target", "feedback", "iti"]
+        phase_names = ["trial_start", "pre-target",
+                       "target", "feedback", "iti"]
 
         super().__init__(
             session,
@@ -398,7 +400,8 @@ class SingletonTrial_training(SingletonTrial):
             self.session.fixation_dot.color = "white"
         elif self.phase == 1:
             self.session.fixation_dot.color = "white"
-            self.drift_correction_step()
+            if self.session.eyetracker_on:
+                self.drift_correction_step()
 
         if self.phase == 2:
             if self.stimulus_onset is None:
